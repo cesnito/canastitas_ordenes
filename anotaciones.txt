@@ -1,0 +1,11 @@
+OrdenProductoDetalle
+    se agrego campo anotaciones
+Proveedores
+    se extendio el campo de varchar a text
+Productos
+    se agrego un campo habilitado
+
+
+
+Trigger
+    Se modifico el trigger de insumos compras
