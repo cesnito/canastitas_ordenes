@@ -6,6 +6,7 @@ import 'package:ordenes/modelos/usuario.dart';
 class CanastitasAPI {
   final ApiClient api = ApiClient(
     baseUrl: "https://cesnio-lascanastitas.com/api/api/",
+    // baseUrl: "http://192.168.100.63/apicanastitas/api/",
   );
 
   final Usuario? usuario;

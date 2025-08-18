@@ -46,8 +46,6 @@ class _TipoConsumoScreenState extends State<TipoConsumoScreen> {
               ),
             ),
             const SizedBox(height: 30),
-
-            // 🔹 Reutilizamos tu widget aquí
             ParaLlevarSwitch(
               isParaLlevarPorDefecto: false,
               onChanged: (value) {

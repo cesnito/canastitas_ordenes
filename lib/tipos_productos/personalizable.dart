@@ -3,12 +3,16 @@ import 'package:ordenes/modelos/producto.dart';
 
 class ProductOptionsCardList extends StatefulWidget {
   final List<ProductOption> opciones;
-  final Function(ProductOption) onOpcionSeleccionada; // 👈 cambia int -> ProductOption
+  final ProductOption? opcionSeleccionada; // 👈 opción actualmente seleccionada
+  final Function(ProductOption) onOpcionSeleccionada;
+  final bool quitarMas;
 
   const ProductOptionsCardList({
     Key? key,
     required this.opciones,
     required this.onOpcionSeleccionada,
+    this.opcionSeleccionada,
+    this.quitarMas = false
   }) : super(key: key);
 
   @override
@@ -16,7 +20,27 @@ class ProductOptionsCardList extends StatefulWidget {
 }
 
 class _ProductOptionsCardListState extends State<ProductOptionsCardList> {
-  int? _opcionSeleccionada;
+  late int _opcionSeleccionadaId;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Si ya hay una opción seleccionada, úsala
+    if (widget.opcionSeleccionada != null) {
+      _opcionSeleccionadaId = widget.opcionSeleccionada!.idProductoOpcion;
+    } else if (widget.opciones.length == 1) {
+      // Si solo hay una opción, autoselecciónala
+      _opcionSeleccionadaId = widget.opciones.first.idProductoOpcion;
+      // Notifica inmediatamente al padre
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onOpcionSeleccionada(widget.opciones.first);
+      });
+    } else {
+      // Ninguna seleccionada aún
+      _opcionSeleccionadaId = -1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +51,14 @@ class _ProductOptionsCardListState extends State<ProductOptionsCardList> {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final opcion = widget.opciones[index];
-        final seleccionada = _opcionSeleccionada == opcion.idProductoOpcion;
+        final seleccionada = _opcionSeleccionadaId == opcion.idProductoOpcion;
 
         return GestureDetector(
           onTap: () {
             setState(() {
-              _opcionSeleccionada = opcion.idProductoOpcion;
+              _opcionSeleccionadaId = opcion.idProductoOpcion;
             });
-            widget.onOpcionSeleccionada(opcion); // 👈 ahora envía el objeto completo
+            widget.onOpcionSeleccionada(opcion);
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -63,20 +87,20 @@ class _ProductOptionsCardListState extends State<ProductOptionsCardList> {
             ),
             child: Row(
               children: [
-                // Columna 1: Imagen
                 ClipRRect(
-                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+                  borderRadius: const BorderRadius.horizontal(
+                    left: Radius.circular(16),
+                  ),
                   child: Image.network(
                     opcion.imagen,
                     width: 120,
-                    height: 120,
+                    height: 100,
                     fit: BoxFit.cover,
                   ),
                 ),
-                // Columna 2: Nombre, descripción, precio
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -84,22 +108,32 @@ class _ProductOptionsCardListState extends State<ProductOptionsCardList> {
                         Text(
                           opcion.nombre,
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 25,
                             fontWeight: FontWeight.bold,
-                            color: seleccionada ? Colors.blueAccent : Colors.black87,
+                            color: seleccionada
+                                ? Colors.blueAccent
+                                : Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           opcion.descripcion,
-                          style: const TextStyle(fontSize: 14, color: Colors.black54),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          "\$${opcion.precioCliente.toStringAsFixed(2)}",
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
-                        ),
+                        // Precio solo si es diferente de 0
+                        if (opcion.precioCliente > 0)
+                          Text(
+                            ((widget.quitarMas) ? "" : "+") +" \$${opcion.precioCliente.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
                       ],
                     ),
                   ),

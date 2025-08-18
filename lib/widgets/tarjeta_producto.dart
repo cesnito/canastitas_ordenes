@@ -11,6 +11,16 @@ class TarjetaProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    Color sombreado = Constantes.colorPrimario;
+    if(product.esProductoPaquete()){
+      sombreado = Constantes.colorSecundario;
+    }
+    if(product.esProductoPersonalizable()){
+      sombreado = Constantes.colorSecundario; 
+    }
+    
+
     return Stack(
       children: [
         GestureDetector(
@@ -18,6 +28,7 @@ class TarjetaProducto extends StatelessWidget {
               ? click
               : null, // solo responde si está disponible
           child: Card(
+            shadowColor: sombreado,
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             child: ListTile(
               leading: Hero(
@@ -34,14 +45,19 @@ class TarjetaProducto extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                'MXN \$${product.precioPublico.toStringAsFixed(2)}',
+                  (product.esProductoSencillo()) ? Text(
+                'MXN \$${product.precioCliente.toStringAsFixed(2)}',
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              ): Container(), 
+              
+              (product.disponibles > 0 && product.esProductoSencillo()) ? Text(
+                'Disponibles: ${product.disponibles} aprox',
+                style: TextStyle(color: Colors.red, fontSize: 18, fontWeight: FontWeight.bold),
+              ) : Container(),
+              Text(
+                '${product.descripcion}',
                 style: TextStyle(color: Colors.black, fontSize: 18),
               ),
-              (product.disponibles > 0) ? Text(
-                'Disponibles: ${product.disponibles}',
-                style: TextStyle(color: Colors.red, fontSize: 18, fontWeight: FontWeight.bold),
-              ) : Container()
                 ],
               ),
               trailing: IconButton(

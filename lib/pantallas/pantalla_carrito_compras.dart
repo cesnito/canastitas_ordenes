@@ -98,15 +98,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
         'notas': anotaciones,
         'idMesa': selectedMesa,
         'esParaLlevar': paraLlevar,
-        'productos': cart.cartItems
-            .map(
-              (p) => {
-                'idProducto': p.idProducto,
-                'cantidad': p.cantidad, 
-                'nota': p.notas,
-              },
-            )
-            .toList(),
+        'productos': cart.cartItems,
         'total': cart.totalPrice,
       };
 
@@ -230,15 +222,61 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
                   },
                   child: ListTile(
                     leading: Image.network(product.imagen, width: 50),
-                    title: Text(product.nombre),
+                    title: Text(
+                      product.nombre,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          "Precio: MXN ${product.precioPublico.toStringAsFixed(2)}",
-                        ),
+                        if (!product.esProductoPaquete())
+                          Text(
+                            "Precio: MXN ${product.precioCliente.toStringAsFixed(2)}",
+                          ),
+                        if (product.esProductoPaquete())
+                          Text(
+                            "Precio: MXN ${product.precioTotal.toStringAsFixed(2)}",
+                          ),
                         Text("Cantidad: ${product.cantidad}"),
+                        if (product.esProductoPaquete())
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: product.productos.map((subProd) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 8.0,
+                                  top: 2.0,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "• ${subProd.nombre} x${subProd.cantidad}",
+                                    ),
+                                    if (subProd.opcionSeleccionada != null)
+                                      Text(
+                                        "   ↳ ${subProd.opcionSeleccionada!.nombre}",
+                                      ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+
+                        // Si es un producto PERSONALIZABLE
+                        if (product.esProductoPersonalizable() &&
+                            product.opcionSeleccionada != null)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0, top: 2.0),
+                            child: Text(
+                              "• Opción: ${product.opcionSeleccionada!.nombre}",
+                            ),
+                          ),
                         if (product.notas != null && product.notas!.isNotEmpty)
                           Text("Nota: ${product.notas!}"),
                       ],
@@ -249,6 +287,8 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
                         IconButton(
                           icon: const Icon(Icons.edit),
                           onPressed: () async {
+                            print("Editando: ");
+                            print(product);
                             final updatedProduct = await Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -352,9 +392,11 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
 
             const SizedBox(height: 20),
 
-            ParaLlevarSwitch(onChanged: (estado){
-              paraLlevar = estado;
-            },),
+            ParaLlevarSwitch(
+              onChanged: (estado) {
+                paraLlevar = estado;
+              },
+            ),
 
             const SizedBox(height: 20),
 

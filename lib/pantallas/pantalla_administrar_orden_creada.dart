@@ -79,6 +79,7 @@ class PantallaDetallesOrdenCreadaState
         ordenRecibida.idOrden,
         onSuccess: (res) {
           final orden = res.data;
+          print("Detalles de orden"); 
           print(orden['productos']);
 
           final ordendetalle = res.data;
@@ -96,8 +97,6 @@ class PantallaDetallesOrdenCreadaState
           for (var p in productosOrden) {
             cart.addToCart(p); // O el método que uses para agregar productos
           }
-
-          print(ordendetalle);
 
           setState(() {
             cliente = ordendetalle['cliente'];
@@ -182,15 +181,7 @@ class PantallaDetallesOrdenCreadaState
                   'notas': anotaciones,
                   'esParaLlevar': paraLlevar,
                   'idMesa': selectedMesa,
-                  'productos': cart.cartItems
-                      .map(
-                        (p) => {
-                          'idProducto': p.idProducto,
-                          'cantidad': p.cantidad,
-                          'nota': p.notas,
-                        },
-                      )
-                      .toList(),
+                  'productos': cart.cartItems,
                   'total': cart.totalPrice,
                 };
 
@@ -548,6 +539,7 @@ class PantallaDetallesOrdenCreadaState
                 itemCount: cart.cartItems.length,
                 itemBuilder: (context, index) {
                   final product = cart.cartItems[index];
+                  print(product);
                   return Dismissible(
                     key: Key('${product.idProducto}-$index'),
                     background: Container(
@@ -569,18 +561,67 @@ class PantallaDetallesOrdenCreadaState
                     },
                     child: ListTile(
                       leading: Image.network(product.imagen, width: 50),
-                      title: Text(product.nombre),
+                      title: Text(product.nombre,
+                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 17),),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          if(!product.esProductoPaquete())
                           Text(
-                            "Precio: MXN ${product.precioPublico.toStringAsFixed(2)}",
+                            "Precio: MXN ${product.precioCliente.toStringAsFixed(2)}",
                           ),
                           Text("Cantidad: ${product.cantidad}"),
+                          if(product.esProductoPaquete())
+                          Text("Total: ${(product.precioCliente).toStringAsFixed(2)}", style: TextStyle(color: Colors.red, fontSize: 18),),
+                          if(!product.esProductoPaquete())
+                          Text("Total: ${(product.precioCliente * product.cantidad).toStringAsFixed(2)}", style: TextStyle(color: Colors.red, fontSize: 18),),
+
+                          if (product.esProductoPaquete())
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: product.productos.map((subProd) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 8.0,
+                                    top: 2.0,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "• ${subProd.nombre} x${subProd.cantidad}",
+                                      ),
+                                      if (subProd.opcionSeleccionada != null)
+                                        Text(
+                                          "   ↳ ${subProd.opcionSeleccionada!.nombre}",
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+
+                          // Si es un producto PERSONALIZABLE
+                          if (product.esProductoPersonalizable() &&
+                              product.opcionSeleccionada != null)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 8.0,
+                                top: 2.0,
+                              ),
+                              child: Text(
+                                "• Opción: ${product.opcionSeleccionada!.nombre}",
+                              ),
+                            ),
+
                           if (product.notas != null &&
                               product.notas!.isNotEmpty)
                             Text("Nota: ${product.notas!}"),
+                          if (product.esProductoPaquete()) Column(children: []),
+                          if (product.esProductoPersonalizable())
+                            Column(children: []),
                         ],
                       ),
                       trailing:
@@ -656,6 +697,13 @@ class PantallaDetallesOrdenCreadaState
                     ),
                   );
                 },
+              ),
+              Text(
+                "Total: \$${cart.totalPrice.toStringAsFixed(2)} MXN",
+                style: const TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               (!ordenRecibida.ordenLista())

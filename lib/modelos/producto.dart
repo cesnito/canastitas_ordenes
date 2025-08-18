@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class ProductOption {
   final int idProductoOpcion;
   final String nombre;
@@ -41,7 +43,6 @@ class ProductOption {
   }
 }
 
-
 class Product {
   static const SENCILLO = 1;
   static const PERSONALIZABLE = 2;
@@ -50,8 +51,8 @@ class Product {
   final int idProducto;
   final int habilitado;
   final String nombre;
-  final double precioPublico;
-  final double precioPublicoDescuento;
+  final double precioCliente;
+  final double precioClienteDescuento;
   final int descuento;
   final String imagen;
   final String descripcion;
@@ -60,31 +61,45 @@ class Product {
   final String notas;
   final int tipoProducto;
   final List<ProductOption> opciones;
+  final ProductOption? opcion;
   final ProductOption? opcionSeleccionada;
+  final List<Product> productos; // subproductos
+  final String etiqueta;
+  final int idProductoSubProducto;
+  final double precioPaquete; // Nuevo: solo aplica si es paquete
+
+  // NUEVO: ID único para carrito
+  final String? cartId;
 
   const Product({
     required this.idProducto,
     required this.habilitado,
     required this.nombre,
-    required this.precioPublico,
-    required this.precioPublicoDescuento,
+    required this.precioCliente,
+    required this.precioClienteDescuento,
     required this.descuento,
     required this.imagen,
     required this.descripcion,
     required this.disponibles,
+    required this.idProductoSubProducto,
     this.cantidad = 1,
     this.notas = '',
     this.tipoProducto = 1,
     this.opciones = const [],
-    this.opcionSeleccionada
+    this.opcion,
+    this.opcionSeleccionada,
+    this.productos = const [],
+    this.etiqueta = 'Elige:',
+    this.precioPaquete = 0.0,
+    this.cartId,
   });
 
   Product copyWith({
     int? idProducto,
     int? habilitado,
     String? nombre,
-    double? precioPublico,
-    double? precioPublicoDescuento,
+    double? precioCliente,
+    double? precioClienteDescuento,
     int? descuento,
     String? imagen,
     String? descripcion,
@@ -93,14 +108,20 @@ class Product {
     String? notas,
     int? tipoProducto,
     List<ProductOption>? opciones,
-    ProductOption? opcionSeleccionada
+    ProductOption? opcion,
+    ProductOption? opcionSeleccionada,
+    List<Product>? productos,
+    String? etiqueta,
+    int? idProductoSubProducto,
+    double? precioPaquete,
+    String? cartId,
   }) {
     return Product(
       idProducto: idProducto ?? this.idProducto,
       habilitado: habilitado ?? this.habilitado,
       nombre: nombre ?? this.nombre,
-      precioPublico: precioPublico ?? this.precioPublico,
-      precioPublicoDescuento: precioPublicoDescuento ?? this.precioPublicoDescuento,
+      precioCliente: precioCliente ?? this.precioCliente,
+      precioClienteDescuento: precioClienteDescuento ?? this.precioClienteDescuento,
       descuento: descuento ?? this.descuento,
       imagen: imagen ?? this.imagen,
       descripcion: descripcion ?? this.descripcion,
@@ -109,17 +130,30 @@ class Product {
       notas: notas ?? this.notas,
       tipoProducto: tipoProducto ?? this.tipoProducto,
       opciones: opciones ?? this.opciones,
+      opcion: opcion ?? this.opcion,
       opcionSeleccionada: opcionSeleccionada ?? this.opcionSeleccionada,
+      productos: productos ?? this.productos,
+      etiqueta: etiqueta ?? this.etiqueta,
+      idProductoSubProducto: idProductoSubProducto ?? this.idProductoSubProducto,
+      precioPaquete: precioPaquete ?? this.precioPaquete, 
+      cartId: cartId ?? this.generateCartId(),
     );
   }
+
+  String generateCartId() {
+    final random = Random().nextInt(10000000);
+    return '${idProducto}_$random'; 
+  }
+
+  bool isSameProduct(Product other) => cartId == other.cartId;
 
   Map<String, dynamic> toJson() => {
         'idProducto': idProducto,
         'tipoProducto': tipoProducto,
         'habilitado': habilitado,
         'nombre': nombre,
-        'precioPublico': precioPublico,
-        'precioPublicoDescuento': precioPublicoDescuento,
+        'precioCliente': precioCliente,
+        'precioClienteDescuento': precioClienteDescuento,
         'descuento': descuento,
         'imagen': imagen,
         'descripcion': descripcion,
@@ -127,7 +161,13 @@ class Product {
         'cantidad': cantidad,
         'notas': notas,
         'opciones': opciones.map((o) => o.toJson()).toList(),
-        'opcionSeleccionada': opcionSeleccionada?.toJson(), 
+        'opcion': opcion?.toJson(),
+        'opcionSeleccionada': opcionSeleccionada?.toJson(),
+        'productos': productos.map((p) => p.toJson()).toList(),
+        'etiqueta': etiqueta,
+        'idProductoSubProducto': idProductoSubProducto,
+        'precioPaquete': precioPaquete,
+        'cartId': cartId,
       };
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -140,14 +180,16 @@ class Product {
     final opcionesJson = json['opciones'] as List? ?? [];
     final opciones = opcionesJson.map((e) => ProductOption.fromJson(e)).toList();
 
+    final productosJson = json['productos'] as List? ?? [];
+    final productos = productosJson.map((e) => Product.fromJson(e)).toList();
+
     return Product(
       idProducto: parseIntSafe(json['idProducto'], 0),
       tipoProducto: parseIntSafe(json['tipoProducto'], 1),
       habilitado: parseIntSafe(json['habilitado'], 0),
       nombre: json['nombre'] ?? '',
-      precioPublico: double.tryParse(json['precioPublico']?.toString() ?? '') ?? 0,
-      precioPublicoDescuento:
-          double.tryParse(json['precioPublicoDescuento']?.toString() ?? '') ?? 0,
+      precioCliente: double.tryParse(json['precioCliente']?.toString() ?? '') ?? 0,
+      precioClienteDescuento: double.tryParse(json['precioClienteDescuento']?.toString() ?? '') ?? 0,
       descuento: parseIntSafe(json['descuento'], 0),
       imagen: json['imagen'] ?? '',
       descripcion: json['descripcion'] ?? '',
@@ -158,16 +200,41 @@ class Product {
       opcionSeleccionada: json['opcionSeleccionada'] != null
           ? ProductOption.fromJson(json['opcionSeleccionada'])
           : null,
+      opcion: (json['opcion'] != null && (json['opcion'] as Map).isNotEmpty)
+          ? ProductOption.fromJson(json['opcion'])
+          : null,
+      productos: productos,
+      etiqueta: json['etiqueta'] ?? '',
+      precioPaquete: double.tryParse(json['precioPaquete']?.toString() ?? '') ?? 0.0,
+        cartId: json['cartId'],
+      idProductoSubProducto: parseIntSafe(json['idProductoSubProducto'], 0),
+
     );
   }
 
   @override
   String toString() {
-    return 'Product{idProducto: $idProducto, name: $nombre, quantity: $cantidad, disponibles: $disponibles, imagen: "$imagen", selecionada: $opcionSeleccionada}';
+    return 'Product{idProducto: $idProducto, name: $nombre, quantity: $cantidad, precio: $precioCliente, disponibles: $disponibles, imagen: "$imagen", seleccionada: $opcionSeleccionada, subProductos: $productos, precioPaquete: $precioPaquete}';
   }
 
-  bool estaHabilitado() => habilitado == 1;
+  double get precioTotal {
+  double total = 0;
 
+  if (tipoProducto == PAQUETE) {
+    double totalSubproductos = 0;
+    for (var sub in productos) {
+      totalSubproductos += sub.opcionSeleccionada?.precioCliente ?? sub.precioCliente;
+    }
+    total = totalSubproductos + precioPaquete;
+  } else {
+    total = precioCliente;
+  }
+
+  return total * cantidad; // multiplicamos siempre por la cantidad
+}
+  
+
+  bool estaHabilitado() => habilitado == 1;
   bool esProductoSencillo() => tipoProducto == SENCILLO;
   bool esProductoPersonalizable() => tipoProducto == PERSONALIZABLE;
   bool esProductoPaquete() => tipoProducto == PAQUETE;

@@ -13,14 +13,22 @@ class PantallaHome extends StatefulWidget {
 
 class _PantallaHomeState extends State<PantallaHome> {
   late DatabaseReference _ordenesRef;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
 
-@override
-void initState() {
-  super.initState();
-  final sesion = Provider.of<SesionProvider>(context, listen: false).session!;
-  int valor = sesion.idSucursal;
-  _ordenesRef = FirebaseDatabase.instance.ref().child('ordenes/$valor');
-}
+  @override
+  void initState() {
+    super.initState();
+    final sesion = Provider.of<SesionProvider>(context, listen: false).session!;
+    int valor = sesion.idSucursal;
+    _ordenesRef = FirebaseDatabase.instance.ref().child('ordenes/$valor');
+
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text.toLowerCase();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +36,19 @@ void initState() {
       selectedIndex: 0,
       title: "Las canastitas",
       body: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: "Buscar por cliente o #Orden...",
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ),
         StreamBuilder<DatabaseEvent>(
           stream: _ordenesRef.onValue,
           builder: (context, snapshot) {
@@ -42,9 +63,26 @@ void initState() {
                   // .where((e) => e.value['status'] == 'pendiente')
                   .toList();
 
+              ordenesPendientes.sort((a, b) {
+                final fechaA = DateTime.parse(a.value['creado']);
+                final fechaB = DateTime.parse(b.value['creado']);
+                return fechaB.compareTo(fechaA);
+              });
+
               if (ordenesPendientes.isEmpty) {
                 return Center(child: Text('No hay órdenes pendientes.'));
               }
+
+              final ordenesFiltradas = ordenesPendientes.where((e) {
+                final raw = Map<String, dynamic>.from(e.value as Map);
+                final orden = OrdenTiempoReal.fromJson(raw);
+
+                final cliente = orden.cliente.toLowerCase();
+                final idOrden = orden.idOrden.toString();
+
+                return cliente.contains(_searchQuery) || idOrden.contains(_searchQuery);
+              }).toList(); 
+
               return Container(
                 padding: EdgeInsets.all(5),
                 height: MediaQuery.of(context).size.height - 270,
@@ -53,10 +91,10 @@ void initState() {
                   border: Border.all(color: Colors.black),
                 ),
                 child: ListView.builder(
-                  itemCount: ordenesPendientes.length,
+                  itemCount: ordenesFiltradas.length,
                   itemBuilder: (context, index) {
                     final _raworden = Map<String, dynamic>.from(
-                      ordenesPendientes[index].value as Map,
+                      ordenesFiltradas[index].value as Map,
                     );
                     OrdenTiempoReal orden = OrdenTiempoReal.fromJson(_raworden);
                     return Container(
@@ -68,7 +106,7 @@ void initState() {
                         children: [
                           Container(
                             width: double.infinity,
-                            height: 100,
+                            height: 140,
                             child: Container(
                               decoration: BoxDecoration(
                                 border: Border(
@@ -100,10 +138,10 @@ void initState() {
                                     flex: 7,
                                     child: Container(
                                       alignment: Alignment.centerLeft,
-                                      padding: EdgeInsets.all(10),
+                                      padding: EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(15),
+                                          topLeft: Radius.circular(10),
                                         ),
                                         color: orden.obtenerEstatusColor(),
                                       ),
@@ -116,8 +154,24 @@ void initState() {
                                             style: TextStyle(fontSize: 20),
                                           ),
                                           Text(
+                                            "Cliente: ${orden.cliente}",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          Text(
                                             "${orden.obtenerEstatusOrden()}",
                                             style: TextStyle(fontSize: 15),
+                                          ),
+                                          Text(
+                                            "Total: \$${orden.total.toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                           Text(
                                             "${orden.obtenerHoraConHace()} - ${orden.obtenerMesa()}",
@@ -196,8 +250,8 @@ void initState() {
       ],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigator.pushNamed(context, '/ordenar');
-          Navigator.pushNamed(context, '/tipoconsumo');
+          Navigator.pushNamed(context, '/ordenar');
+          // Navigator.pushNamed(context, '/tipoconsumo');
         },
         child: Icon(Icons.add_shopping_cart),
         backgroundColor: Constantes.colorPrimario,

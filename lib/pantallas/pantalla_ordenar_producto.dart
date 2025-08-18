@@ -51,11 +51,13 @@ class _PantallaOrdenarProductoState extends State<PantallaOrdenarProducto> {
     final api = CanastitasAPI(usuario: sesion);
     api.obtenerProductos(
       onSuccess: (res) {
+        print(res.data);
         final List<dynamic> productos = res.data;
+        productos.forEach((e) => print(e['idProductoSubProducto']));
         List<Product> all = productos
             .map((item) => Product.fromJson(item))
             .toList();
-        all.forEach((e) => print(e));
+        //all.forEach((e) => print(e));
         setState(() {
           products = all;
           filteredProducts = all; // Inicialmente todos
@@ -152,6 +154,7 @@ class _PantallaOrdenarProductoState extends State<PantallaOrdenarProducto> {
                                   builder: (_) => PantallaDetallesProducto(
                                     product: product,
                                     isEditing: widget.esEdicion,
+                                    resetCantidad: true, 
                                   ),
                                 ),
                               );

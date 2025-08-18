@@ -41,7 +41,7 @@ class ApiClient {
       {String? token}) async {
     final uri = Uri.parse('$baseUrl$endpoint');
     print(uri.toString());
-    print('"${token}"');
+    // print('"${token}"');
     final response = await http.post(
       uri,
       headers: _buildHeaders(token),
@@ -50,7 +50,7 @@ class ApiClient {
     try {
       print(response.body);
       final decodedString = utf8.decode(response.bodyBytes);
-      print(decodedString);
+      // print(decodedString);
       final Map<String, dynamic> jsonBody = json.decode(decodedString);
       // final Map<String, dynamic> jsonBody = json.decode(response.body);
       int estatus = jsonBody['estatus'];
