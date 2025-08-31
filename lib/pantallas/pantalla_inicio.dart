@@ -52,7 +52,7 @@ class _PantallaHomeState extends State<PantallaHome> {
         StreamBuilder<DatabaseEvent>(
           stream: _ordenesRef.onValue,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.connectionState == ConnectionState.waiting) { 
               return Center(child: CircularProgressIndicator());
             }
 
@@ -193,21 +193,7 @@ class _PantallaHomeState extends State<PantallaHome> {
                             child: Row(
                               children: [
                                 Expanded(
-                                  flex: 7,
-                                  child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      "${orden.cliente}",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Constantes.colorPrimario,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
+                                  flex: 2,
                                   child: Container(
                                     width: double.infinity,
                                     color: Constantes.colorSecundario,
@@ -233,6 +219,22 @@ class _PantallaHomeState extends State<PantallaHome> {
                                     ),
                                   ),
                                 ),
+                                Expanded(
+                                  flex: 8,
+                                  child: Container(
+                                    margin: EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      "${orden.cliente}",
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Constantes.colorPrimario,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                
                               ],
                             ),
                           ),

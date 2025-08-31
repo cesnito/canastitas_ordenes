@@ -69,63 +69,63 @@ class TarjetaProducto extends StatelessWidget {
             ),
           ),
         ),
-        (!product.estaHabilitado()) ? 
-          Positioned.fill(
-            child: ClipRect(
-              // <-- recorta todo lo que salga fuera
-              child: Container(
-                color: Colors.black.withAlpha(80),
-                alignment: Alignment.center,
-                child: Transform.rotate(
-                  angle: 0.4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    color: Constantes.colorSecundario,
-                    child: Text(
-                      'NO DISPONIBLE',
-                      style: TextStyle(
-                        color: Constantes.colorPrimario,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ) : (product.disponibles == 0) ? 
-          Positioned.fill(
-            child: ClipRect(
-              // <-- recorta todo lo que salga fuera
-              child: Container(
-                color: Colors.black.withAlpha(80),
-                alignment: Alignment.center,
-                child: Transform.rotate(
-                  angle: 0.4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    color: Constantes.colorPrimario,
-                    child: Text(
-                      'Agotado',
-                      style: TextStyle(
-                        color: Constantes.colorSecundario,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ) : Container() 
+        // (!product.estaHabilitado()) ?  
+        //   Positioned.fill(
+        //     child: ClipRect(
+        //       // <-- recorta todo lo que salga fuera
+        //       child: Container(
+        //         color: Colors.black.withAlpha(80),
+        //         alignment: Alignment.center,
+        //         child: Transform.rotate(
+        //           angle: 0.4,
+        //           child: Container(
+        //             padding: const EdgeInsets.symmetric(
+        //               horizontal: 12,
+        //               vertical: 4,
+        //             ),
+        //             color: Constantes.colorSecundario,
+        //             child: Text(
+        //               'NO DISPONIBLE',
+        //               style: TextStyle(
+        //                 color: Constantes.colorPrimario,
+        //                 fontWeight: FontWeight.bold,
+        //                 letterSpacing: 2,
+        //                 fontSize: 16,
+        //               ),
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ) : (product.disponibles == 0) ? 
+        //   Positioned.fill(
+        //     child: ClipRect(
+        //       // <-- recorta todo lo que salga fuera
+        //       child: Container(
+        //         color: Colors.black.withAlpha(80),
+        //         alignment: Alignment.center,
+        //         child: Transform.rotate(
+        //           angle: 0.4,
+        //           child: Container(
+        //             padding: const EdgeInsets.symmetric(
+        //               horizontal: 12,
+        //               vertical: 4,
+        //             ),
+        //             color: Constantes.colorPrimario,
+        //             child: Text(
+        //               'Agotado',
+        //               style: TextStyle(
+        //                 color: Constantes.colorSecundario,
+        //                 fontWeight: FontWeight.bold,
+        //                 letterSpacing: 2,
+        //                 fontSize: 16,
+        //               ),
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ) : Container() 
       ],
     );
   }
