@@ -56,6 +56,7 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
       print("Nuevo ID: ${productoDetalle.cartId}");
     } else {
       print("viene de carrito de compras");
+      print(widget.product);
       // Generar cartId para esta instancia si no existe
       if (widget.product.esProductoPaquete()) {
         productoDetalle = widget.product.copyWith(
@@ -71,15 +72,20 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
         print("no es paquete, copiando opciones");
         productoDetalle = widget.product.copyWith(
           cartId: widget.product.cartId,
-          opciones: widget.product.opciones, 
+          opciones: widget.product.opciones,
         );
       }
 
+      if (productoDetalle.esProductoPersonalizable()) {
+        // print(productoDetalle.opcionSeleccionada);
+        opcionSeleccionada = productoDetalle.opcionSeleccionada!;
+      }
       print("Editar ID: ${widget.product.cartId}");
     }
 
     if (productoDetalle.esProductoSencillo()) {
       print("es producto sencillo");
+      print(productoDetalle);
       if (productoDetalle.opcionSeleccionada == null) {
         print("ajustando porque es sencillo");
         productoDetalle = productoDetalle.copyWith(
@@ -89,7 +95,7 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
         print(
           "Producto sencillo: opción única auto seleccionada -> ${productoDetalle.opcionSeleccionada!.nombre}",
         );
-      }else{
+      } else {
         print("ya esta seleccionado");
       }
     }
@@ -191,19 +197,21 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
       }
     } else {
       print("Es sencillo o personalizado");
-       if( productoDetalle.esProductoPersonalizable() ){
-          productoDetalle = productoDetalle.copyWith(
-            cartId: productoDetalle.cartId,
-            opcionSeleccionada: opcionSeleccionada,
-            opciones: productoDetalle.opciones,
-          );
-       }
-       if( productoDetalle.esProductoSencillo() ){
-          productoDetalle = productoDetalle.copyWith(
-            cartId: productoDetalle.cartId,
-            opciones: productoDetalle.opciones,
-          );
-       }
+      if (productoDetalle.esProductoPersonalizable()) {
+        print("Es un personalizado");
+        print(opcionSeleccionada);
+        productoDetalle = productoDetalle.copyWith(
+          cartId: productoDetalle.cartId,
+          opcionSeleccionada: opcionSeleccionada,
+          opciones: productoDetalle.opciones,
+        );
+      }
+      if (productoDetalle.esProductoSencillo()) {
+        productoDetalle = productoDetalle.copyWith(
+          cartId: productoDetalle.cartId,
+          opciones: productoDetalle.opciones,
+        );
+      }
 
       if (productoDetalle.opcionSeleccionada == null) {
         Dialogo.mostrarMensaje(
@@ -242,7 +250,7 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
         notas: _noteController.text,
         productos: productoDetalle.productos,
         cartId: productoDetalle.cartId,
-        precioCliente: productoDetalle.precioTotal
+        precioCliente: productoDetalle.precioTotal,
       );
     }
     // Verificar si ya existe en el carrito por cartId
@@ -399,7 +407,7 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
 
             (product.esProductoPersonalizable()) //Si es un producto personalizable
                 ? ProductOptionsCardList(
-                  opcionSeleccionada: productoDetalle.opcionSeleccionada,
+                    opcionSeleccionada: productoDetalle.opcionSeleccionada,
                     quitarMas: true,
                     opciones: productoDetalle.opciones,
                     onOpcionSeleccionada: (ProductOption opcion) {

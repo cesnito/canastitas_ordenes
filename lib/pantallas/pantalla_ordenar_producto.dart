@@ -119,8 +119,9 @@ class _PantallaOrdenarProductoState extends State<PantallaOrdenarProducto> {
               },
             ),
       body: [
-        Container(
-          height: MediaQuery.of(context).size.height, // Limita altura para Expanded
+        Container( 
+          height: MediaQuery.of(context).size.height - 200, // Limita altura para Expanded
+          
           child: Column(
             children: [
               // Buscador fijo
