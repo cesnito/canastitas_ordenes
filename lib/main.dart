@@ -1,3 +1,4 @@
+import 'package:ordenes/pantallas/pantalla_administrar_orden_cobrar.dart';
 import 'package:ordenes/pantallas/pantalla_administrar_orden_creada.dart';
 import 'package:ordenes/pantallas/pantalla_inicio.dart';
 import 'package:ordenes/pantallas/pantalla_iniciar_sesion.dart';
@@ -53,7 +54,9 @@ class MyApp extends StatelessWidget {
       '/tipoconsumo': (context) => TipoConsumoScreen(),
       '/home': (context) => PantallaHome(), 
       '/ordenar': (context) => PantallaOrdenarProducto(),  
+      '/cobrar': (context) => PantallaOrdenarProducto(),  
       '/detallesOrdenCreada': (context) => PantallaDetallesOrdenCreada(),   
+      '/detallesOrdenCobrar': (context) => PantallaDetallesOrdenCobrar(),   
     }, 
     );
   }

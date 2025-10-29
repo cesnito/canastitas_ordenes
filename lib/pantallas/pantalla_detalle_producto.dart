@@ -6,6 +6,7 @@ import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/tipos_productos/personalizable.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:ordenes/utils/dialogo.dart';
+import 'package:ordenes/utils/haptic.dart';
 import 'package:ordenes/widgets/boton.dart';
 import 'package:provider/provider.dart';
 
@@ -77,8 +78,9 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
       }
 
       if (productoDetalle.esProductoPersonalizable()) {
-        // print(productoDetalle.opcionSeleccionada);
+        if(productoDetalle.opcionSeleccionada != null){
         opcionSeleccionada = productoDetalle.opcionSeleccionada!;
+        }
       }
       print("Editar ID: ${widget.product.cartId}");
     }
@@ -181,6 +183,7 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
   }
 
   void _addOrUpdateCart(BuildContext context) {
+    Haptic.sense();
     // Validación para productos tipo paquete
     if (productoDetalle.esProductoPaquete()) {
       bool todosSeleccionados = productoDetalle.productos.every(
@@ -273,7 +276,7 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
       SnackBar(
         content: Text(
           "${productoDetalle.nombre} agregado/actualizado en el carrito",
-        ),
+        ),duration: Duration(seconds: 2)
       ),
     );
     Navigator.pop(context);

@@ -12,17 +12,17 @@ import 'package:ordenes/widgets/carrito.dart';
 import 'package:ordenes/widgets/tarjeta_producto.dart';
 import 'package:provider/provider.dart';
 
-class PantallaOrdenarProducto extends StatefulWidget {
+class PantallaCobrarOrdenes extends StatefulWidget {
   final bool esEdicion;
-  PantallaOrdenarProducto({super.key, this.esEdicion = false});
+  PantallaCobrarOrdenes({super.key, this.esEdicion = false});
   final GlobalKey _cartIconKey = GlobalKey();
 
   @override
-  State<PantallaOrdenarProducto> createState() =>
-      _PantallaOrdenarProductoState();
+  State<PantallaCobrarOrdenes> createState() =>
+      _PantallaCobrarOrdenesState();
 }
 
-class _PantallaOrdenarProductoState extends State<PantallaOrdenarProducto> {
+class _PantallaCobrarOrdenesState extends State<PantallaCobrarOrdenes> {
   OverlayEntry? overlayEntry;
 
   List<Product> products = [];

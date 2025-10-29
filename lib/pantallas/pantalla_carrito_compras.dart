@@ -6,6 +6,7 @@ import 'package:ordenes/proveedores/carrito_proveedor.dart';
 import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:ordenes/utils/dialogo.dart';
+import 'package:ordenes/utils/haptic.dart';
 import 'package:ordenes/widgets/boton.dart';
 import 'package:ordenes/widgets/boton_retardo.dart';
 import 'package:ordenes/widgets/para_llevar.dart';
@@ -43,6 +44,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
   ];
 
   void _confirmarOrden() {
+    Haptic.sense();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -80,7 +82,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
     if (cliente.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Por favor ingresa el nombre del cliente"),
+          content: Text("Por favor ingresa el nombre del cliente"),duration: Duration(seconds: 2)
         ),
       );
       return;
@@ -108,7 +110,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
           Navigator.pop(context);
           print('Orden realizada con éxito');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Orden realizada con éxito")),
+            const SnackBar(content: Text("Orden realizada con éxito"),duration: Duration(seconds: 2)),
           );
           cart.clearCart();
           _customerNameController.clear();
@@ -126,7 +128,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
             SnackBar(
               content: Text(
                 "Error al realizar la orden: ${error.error.descripcion}",
-              ),
+              ),duration: Duration(seconds: 2)
             ),
           );
         },
@@ -135,7 +137,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
       Navigator.pop(context); // cerrar diálogo en caso de error también
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ).showSnackBar(SnackBar(content: Text("Error: $e"),duration: Duration(seconds: 2)));
     }
   }
 
@@ -216,7 +218,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
                       SnackBar(
                         content: Text(
                           "${product.nombre} eliminado del carrito",
-                        ),
+                        ),duration: Duration(seconds: 2)
                       ),
                     );
                   },
@@ -319,6 +321,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
                                   TextButton(
                                     child: const Text("Eliminar"),
                                     onPressed: () {
+                                      Haptic.sense();
                                       cart.removeFromCart(product);
                                       Navigator.pop(context);
                                       ScaffoldMessenger.of(
@@ -327,7 +330,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
                                         SnackBar(
                                           content: Text(
                                             "${product.nombre} eliminado del carrito",
-                                          ),
+                                          ),duration: Duration(seconds: 2)
                                         ),
                                       );
                                     },

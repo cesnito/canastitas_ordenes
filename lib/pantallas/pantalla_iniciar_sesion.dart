@@ -6,6 +6,7 @@ import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ordenes/utils/haptic.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,6 +50,7 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
   }
 
   Future<void> _iniciarSesion() async {
+    Haptic.sense();
     final usuario = _usuarioController.text.trim();
     final password = _passwordController.text.trim();
 

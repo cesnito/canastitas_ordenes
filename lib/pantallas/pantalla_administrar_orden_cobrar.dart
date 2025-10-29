@@ -9,21 +9,22 @@ import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:ordenes/utils/dialogo.dart';
 import 'package:ordenes/utils/haptic.dart';
+import 'package:ordenes/utils/mensajes.dart';
 import 'package:ordenes/widgets/boton_retardo.dart';
 import 'package:ordenes/widgets/metodo_pago.dart';
 import 'package:ordenes/widgets/para_llevar.dart';
 import 'package:provider/provider.dart';
 
-class PantallaDetallesOrdenCreada extends StatefulWidget {
-  const PantallaDetallesOrdenCreada({super.key});
+class PantallaDetallesOrdenCobrar extends StatefulWidget {
+  const PantallaDetallesOrdenCobrar({super.key});
 
   @override
-  State<PantallaDetallesOrdenCreada> createState() =>
-      PantallaDetallesOrdenCreadaState();
+  State<PantallaDetallesOrdenCobrar> createState() =>
+      PantallaDetallesOrdenCobrarState();
 }
 
-class PantallaDetallesOrdenCreadaState
-    extends State<PantallaDetallesOrdenCreada> {
+class PantallaDetallesOrdenCobrarState
+    extends State<PantallaDetallesOrdenCobrar> {
   final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _orderNotesController = TextEditingController();
 
@@ -122,7 +123,8 @@ class PantallaDetallesOrdenCreadaState
       });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error al cargar detalles: $e'),duration: Duration(seconds: 2)));
+      ).showSnackBar(SnackBar(content: Text('Error al cargar detalles: $e'),duration: Duration(seconds: 2),)); 
+      Mensajes.show(context, 'Error al cargar detalles: $e');
     }
   }
 
@@ -133,102 +135,6 @@ class PantallaDetallesOrdenCreadaState
     _customerNameController.dispose();
     _orderNotesController.dispose();
     super.dispose();
-  }
-
-  void _confirmarEdicionOrden() {
-    final BuildContext dialogContext = context;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirmar Modificación"),
-        content: const Text("¿Confirmar que la orden se ha modificado?"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              //Navigator.pushReplacementNamed(context, '/home');
-            },
-            child: const Text("Cancelar"),
-          ),
-          BotonCanastitasRetardo(
-            icon: Icon(Icons.delivery_dining, color: Constantes.colorPrimario),
-            label: Text(
-              'Confirmar',
-              style: TextStyle(color: Constantes.colorPrimario),
-            ),
-            color: Colors.black,
-            onLongPressConfirmed: () {
-              final cart = Provider.of<CartProvider>(
-                dialogContext,
-                listen: false,
-              );
-              cart.setEditingMode(true);
-
-              if (cart.cartItems.isEmpty) {
-                ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  const SnackBar(content: Text("El carrito está vacío"),duration: Duration(seconds: 2)),
-                );
-                return;
-              }
-              Navigator.pop(dialogContext);
-              Dialogo.cargando(dialogContext, "Editando orden...");
-              try {
-                final sesion = Provider.of<SesionProvider>(
-                  dialogContext,
-                  listen: false,
-                ).session!;
-                CanastitasAPI api = CanastitasAPI(usuario: sesion);
-
-                final pedidoData = {
-                  'idOrden': idOrden,
-                  'cliente': cliente,
-                  'notas': anotaciones,
-                  'esParaLlevar': paraLlevar,
-                  'metodoPago': metodoPago,
-                  'idMesa': selectedMesa,
-                  'productos': cart.cartItems,
-                  'total': cart.totalPrice,
-                };
-
-                api.editarPedido(
-                  pedidoData,
-                  onSuccess: (response) {
-                    Navigator.pop(dialogContext);
-                    print('Orden editada con éxito');
-                    // Aquí actualiza UI, limpia carrito, etc.
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      const SnackBar(content: Text("Orden editada con éxito"),duration: Duration(seconds: 2)),
-                    );
-                    cart.clearCart();
-                    _customerNameController.clear();
-                    _orderNotesController.clear();
-
-                    Navigator.pushReplacementNamed(dialogContext, '/home');
-                  },
-                  onError: (error) {
-                    Navigator.pop(dialogContext);
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "Error al realizar la orden: ${error.error.descripcion}",
-                        ),duration: Duration(seconds: 2)
-                      ),
-                    );
-                  },
-                );
-              } catch (e) {
-                Navigator.pop(
-                  dialogContext,
-                ); // cerrar diálogo en caso de error también
-                ScaffoldMessenger.of(
-                  dialogContext,
-                ).showSnackBar(SnackBar(content: Text("Error: $e"),duration: Duration(seconds: 2)));
-              }
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   void _cancelarOrden() {
@@ -290,7 +196,8 @@ class PantallaDetallesOrdenCreadaState
                 if (cart.cartItems.isEmpty) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
                     const SnackBar(
-                      content: Text("No puedes cancelar con carrito vacío"),duration: Duration(seconds: 2)
+                      content: Text("No puedes cancelar con carrito vacío"),
+                      duration: Duration(seconds: 2), 
                     ),
                   );
                   return;
@@ -451,8 +358,8 @@ class PantallaDetallesOrdenCreadaState
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     cart.setEditingMode(true);
-
-    final String titulo = "Editar orden '${cliente}' ${idOrden}";
+ 
+    final String titulo = "Cobrar orden '${cliente}' ${idOrden}";
 
     if (_loading) {
       return Scaffold(
@@ -471,26 +378,7 @@ class PantallaDetallesOrdenCreadaState
       canPop: false, // Evita que se cierre solo
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          final salir = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text("¿Salir?"),
-              content: const Text("¿Seguro que quieres regresar?"),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text("No"),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text("Sí"),
-                ),
-              ],
-            ),
-          );
-          if (salir == true) {
             Navigator.pop(context);
-          }
         }
       },
       child: Scaffold(
@@ -649,67 +537,6 @@ class PantallaDetallesOrdenCreadaState
                           : Wrap(
                               spacing: 4,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () async {
-                                    final updatedProduct = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            PantallaDetallesProducto(
-                                              product: product,
-                                              isEditing: true,
-                                              idOrden: idOrden,
-                                            ),
-                                      ),
-                                    );
-                                    if (updatedProduct != null) {
-                                      cart.updateCartProduct(
-                                        product,
-                                        updatedProduct,
-                                      );
-                                    }
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                        title: const Text(
-                                          "¿Eliminar producto?",
-                                        ),
-                                        content: Text(
-                                          "¿Seguro que quieres eliminar \"${product.nombre}\" del carrito?",
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            child: const Text("Cancelar"),
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                          ),
-                                          TextButton(
-                                            child: const Text("Eliminar"),
-                                            onPressed: () {
-                                              cart.removeFromCart(product);
-                                              Navigator.pop(context);
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    "${product.nombre} eliminado del carrito",
-                                                  ),duration: Duration(seconds: 2)
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
                               ],
                             ),
                     ),
@@ -724,29 +551,65 @@ class PantallaDetallesOrdenCreadaState
                 ),
               ),
 
-              (!ordenRecibida.ordenLista())
-                  ? ElevatedButton.icon(
-                            icon: Icon(Icons.add),
-                            label: Text('Agregar producto'),
-                            onPressed: () {
-                              Haptic.sense();
-                              // Navigator.pushNamed(
-                              //   context,
-                              //   '/ordenar',
-                              //   arguments: {
-                              //     'esEdicion': true, // pasa el flag para saber modo
-                              //   },
-                              // );
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      PantallaOrdenarProducto(esEdicion: true),
-                                ),
-                              );
-                            },
-                          )
-                  : Container(),
+              // (!ordenRecibida.ordenLista())
+              //     ? (ordenRecibida.ordenPreparandose())
+              //           ? Container(
+              //               padding: EdgeInsets.symmetric(
+              //                 vertical: 16,
+              //                 horizontal: 24,
+              //               ),
+              //               decoration: BoxDecoration(
+              //                 color: Colors.red[100],
+              //                 borderRadius: BorderRadius.circular(12),
+              //                 boxShadow: [
+              //                   BoxShadow(
+              //                     color: Colors.red.withOpacity(0.4),
+              //                     blurRadius: 8,
+              //                     offset: Offset(0, 3),
+              //                   ),
+              //                 ],
+              //               ),
+              //               child: Row(
+              //                 mainAxisSize: MainAxisSize.min,
+              //                 children: [
+              //                   Text(
+              //                     "🚫 No puedes editar productos\nde una orden en preparación",
+              //                     style: TextStyle(
+              //                       fontSize: 18,
+              //                       fontWeight: FontWeight.bold,
+              //                       color: Colors.red[900],
+              //                     ),
+              //                   ),
+              //                   SizedBox(width: 8),
+              //                   Text(
+              //                     "😞", // Emoji triste
+              //                     style: TextStyle(fontSize: 26),
+              //                   ),
+              //                 ],
+              //               ),
+              //             )
+              //           : ElevatedButton.icon(
+              //               icon: Icon(Icons.add),
+              //               label: Text('Agregar producto'),
+              //               onPressed: () {
+              //                 Haptic.sense();
+              //                 // Navigator.pushNamed(
+              //                 //   context,
+              //                 //   '/ordenar',
+              //                 //   arguments: {
+              //                 //     'esEdicion': true, // pasa el flag para saber modo
+              //                 //   },
+              //                 // );
+              //                 Navigator.push(
+              //                   context,
+              //                   MaterialPageRoute(
+              //                     builder: (context) =>
+              //                         PantallaOrdenarProducto(esEdicion: true),
+              //                   ),
+              //                 );
+              //               },
+              //             )
+              //     : Container(),
 
               const SizedBox(height: 20),
 
@@ -764,13 +627,7 @@ class PantallaDetallesOrdenCreadaState
                       child: Text(mesa["nombre"]),
                     );
                   }).toList(),
-                  onChanged: (ordenRecibida.ordenLista())
-                      ? null
-                      : (value) {
-                          setState(() {
-                            selectedMesa = value!;
-                          });
-                        },
+                  onChanged: null, 
                 ),
               ),
               const SizedBox(height: 10),
@@ -788,7 +645,7 @@ class PantallaDetallesOrdenCreadaState
               const SizedBox(height: 10),
 
               TextField(
-                enabled: !ordenRecibida.ordenLista(),
+                enabled: false,
                 controller: _orderNotesController,
                 decoration: const InputDecoration(
                   labelText: "Anotaciones para la orden",
@@ -799,36 +656,41 @@ class PantallaDetallesOrdenCreadaState
               ),
               const SizedBox(height: 20),
 
-              ParaLlevarSwitch(
-                isParaLlevarPorDefecto: paraLlevar,
-                onChanged: (estado) {
-                  paraLlevar = estado;
-                },
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Método de pago",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      MetodoPagoSwitch(
+                        metodoPagoPorDefecto: metodoPago,
+                        onChanged: (metodoPagoSeleccionado) {
+                          metodoPago = metodoPagoSeleccionado; 
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 40),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   BotonCanastitasRetardo(
-                    enabled: !ordenRecibida.ordenLista(),
-                    icon: Icon(Icons.check, color: Colors.white),
+                    icon: Icon(Icons.delivery_dining, color: Colors.white),
                     label: Text(
-                      'Confirmar',
+                      'Finalizar',
                       style: TextStyle(color: Colors.white),
                     ),
-                    color: Constantes.colorPrimario,
-                    onLongPressConfirmed: _confirmarEdicionOrden,
-                  ),
-                  BotonCanastitasRetardo(
-                    enabled: !ordenRecibida.ordenLista(),
-                    icon: Icon(Icons.cancel, color: Colors.white),
-                    label: Text(
-                      'Cancelar',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    color: Colors.red,
-                    onLongPressConfirmed: _cancelarOrden,
+                    color: Colors.green,
+                    onLongPressConfirmed: _entregarOrden,
                   ),
                 ],
               ),

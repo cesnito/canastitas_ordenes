@@ -16,7 +16,7 @@ class _TipoConsumoScreenState extends State<TipoConsumoScreen> {
   void _confirmarSeleccion() {
     final mensaje = _isParaLlevar ? "Has elegido: Para llevar" : "Has elegido: Comer aquí";
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje)),
+      SnackBar(content: Text(mensaje),duration: Duration(seconds: 2)),
     );
 
     // Si quieres devolver el resultado a otra pantalla:

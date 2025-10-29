@@ -14,7 +14,7 @@ class BotonCanastitasRetardo extends StatefulWidget {
     required this.label,
     required this.color,
     required this.onLongPressConfirmed,
-    this.holdDuration = const Duration(seconds: 1),
+    this.holdDuration = const Duration(milliseconds: 500), 
     this.enabled = true,
   });
 

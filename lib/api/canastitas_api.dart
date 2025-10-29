@@ -59,6 +59,31 @@ class CanastitasAPI {
     }
   }
 
+  Future<void> obtenerTokenFirebase({
+    required void Function(APIResponse) onSuccess,
+    required void Function(APIResponse) onError,
+  }) async {
+    final response = await api.post(
+      'firebase/token',
+      null,
+      token: usuario!.token,
+    );
+    try {
+      if (response.estatus == 200) {
+        onSuccess(response);
+      } else {
+        onError(response);
+      }
+    } catch (e) {
+      print("Fallo aqui");
+      print(e);
+      print("Fallo aqui");
+      var res = APIResponse();
+      res.error = APIError(descripcion: e.toString());
+      onError(APIResponse());
+    }
+  }
+
   Future<void> obtenerProductos({
     required void Function(APIResponse) onSuccess,
     required void Function(APIResponse) onError,

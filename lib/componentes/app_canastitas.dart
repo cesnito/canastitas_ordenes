@@ -4,6 +4,7 @@ import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/servicios/servicio_api.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:flutter/material.dart';
+import 'package:ordenes/utils/haptic.dart';
 import 'package:provider/provider.dart';
 
 class AppCanastitas extends StatefulWidget {
@@ -197,10 +198,15 @@ class AppCanastitasState extends State<AppCanastitas> {
         ),
         floatingActionButton: widget.floatingActionButton,
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed, // Fija los colores aunque tengas más de 3 items
           currentIndex: widget.selectedIndex,
           selectedItemColor: Constantes.colorPrimario,
+          unselectedItemColor: Colors.black54, // Color de los no seleccionados
+          // currentIndex: widget.selectedIndex,
+          // selectedItemColor: Constantes.colorPrimario,
           // onTap: widget.onTabSelected ?? (_) {},
           onTap: (index) {
+            Haptic.sense();
             if (index == widget.selectedIndex) {
               return;
             }
@@ -216,7 +222,15 @@ class AppCanastitasState extends State<AppCanastitas> {
                 '/ordenar',
                 (Route<dynamic> route) => false,
               );
-            } else {
+            } 
+            else if (index == 2) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/cobrar',
+                (Route<dynamic> route) => false,
+              );
+            }  
+            else {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -255,7 +269,14 @@ class AppCanastitasState extends State<AppCanastitas> {
               icon: Icon(Icons.list),
               label: 'Nueva orden',
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Cerrar sesión'),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.attach_money),
+            //   label: 'Cobrar',
+            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Cerrar sesión',
+            ),
           ],
         ),
       ),

@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:ordenes/utils/constantes.dart';
 
-class ParaLlevarSwitch extends StatefulWidget {
-  final bool isParaLlevarPorDefecto;
-  final void Function(bool isParaLlevar)? onChanged;
+class MetodoPagoSwitch extends StatefulWidget {
+  final int metodoPagoPorDefecto;
+  final void Function(int metodoPagoSeleccionado)? onChanged;
 
-  const ParaLlevarSwitch({
+  const MetodoPagoSwitch({
     Key? key,
-    this.isParaLlevarPorDefecto = false, // Valor por defecto
+    this.metodoPagoPorDefecto = 1, // Valor por defecto, efectivo
     this.onChanged,
   }) : super(key: key);
 
   @override
-  State<ParaLlevarSwitch> createState() => _ParaLlevarSwitchState();
+  State<MetodoPagoSwitch> createState() => _MetodoPagoSwitchState();
 }
 
-class _ParaLlevarSwitchState extends State<ParaLlevarSwitch> {
-  late bool isParaLlevar;
+class _MetodoPagoSwitchState extends State<MetodoPagoSwitch> { 
+  late int metodoPagoSeleccion;
 
   @override
   void initState() {
     super.initState();
-    isParaLlevar = widget.isParaLlevarPorDefecto; // Inicializa con valor por defecto
+    metodoPagoSeleccion = widget.metodoPagoPorDefecto; // Inicializa con valor por defecto
   }
 
-  void toggle(bool paraLlevar) {
+  void toggle(int metodoPago) {
     setState(() {
-      isParaLlevar = paraLlevar;
+      metodoPagoSeleccion = metodoPago;
     });
     if (widget.onChanged != null) {
-      widget.onChanged!(isParaLlevar);
+      widget.onChanged!(metodoPagoSeleccion);
     }
   }
 
@@ -39,17 +39,24 @@ class _ParaLlevarSwitchState extends State<ParaLlevarSwitch> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildButton(
-          label: "Comer aquí",
-          icon: Icons.restaurant,
-          selected: !isParaLlevar,
-          onTap: () => toggle(false),
+          label: "Efectivo",
+          icon: Icons.attach_money,
+          selected: metodoPagoSeleccion == 1,
+          onTap: () => toggle(1),
         ),
         const SizedBox(width: 16),
         _buildButton(
-          label: "Para llevar",
-          icon: Icons.shopping_bag,
-          selected: isParaLlevar,
-          onTap: () => toggle(true),
+          label: "Tarjeta",
+          icon: Icons.credit_card,
+          selected: metodoPagoSeleccion == 2,
+          onTap: () => toggle(2),
+        ),
+        const SizedBox(width: 16),
+        _buildButton(
+          label: "Transferencia",
+          icon: Icons.swap_horiz,
+          selected: metodoPagoSeleccion == 3,
+          onTap: () => toggle(3),
         ),
       ],
     );
@@ -67,12 +74,12 @@ class _ParaLlevarSwitchState extends State<ParaLlevarSwitch> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
-          color: selected ? Constantes.colorPrimario : Colors.grey[200],
+          color: selected ? Constantes.colorSecundario : Colors.grey[200],
           borderRadius: BorderRadius.circular(12),
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: Constantes.colorSecundario,
+                    color: Constantes.colorPrimario,
                     offset: const Offset(0, 4),
                     blurRadius: 8,
                   ),
@@ -82,12 +89,12 @@ class _ParaLlevarSwitchState extends State<ParaLlevarSwitch> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 30, color: selected ? Colors.white : Colors.grey[700]),
+            Icon(icon, size: 30, color: selected ? Constantes.colorPrimario : Colors.grey[700]),
             const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
-                color: selected ? Colors.white : Colors.grey[700],
+                color: selected ? Constantes.colorPrimario : Colors.grey[700],
                 fontWeight: FontWeight.bold,
               ),
             ),
