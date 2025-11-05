@@ -4,11 +4,13 @@ import 'package:ordenes/utils/constantes.dart';
 class ParaLlevarSwitch extends StatefulWidget {
   final bool isParaLlevarPorDefecto;
   final void Function(bool isParaLlevar)? onChanged;
+  final bool enabled; // ✅ Nuevo parámetro
 
   const ParaLlevarSwitch({
     Key? key,
-    this.isParaLlevarPorDefecto = false, // Valor por defecto
+    this.isParaLlevarPorDefecto = false,
     this.onChanged,
+    this.enabled = true, // ✅ Por defecto está habilitado
   }) : super(key: key);
 
   @override
@@ -21,37 +23,40 @@ class _ParaLlevarSwitchState extends State<ParaLlevarSwitch> {
   @override
   void initState() {
     super.initState();
-    isParaLlevar = widget.isParaLlevarPorDefecto; // Inicializa con valor por defecto
+    isParaLlevar = widget.isParaLlevarPorDefecto;
   }
 
   void toggle(bool paraLlevar) {
+    if (!widget.enabled) return; // ✅ Ignora si está deshabilitado
     setState(() {
       isParaLlevar = paraLlevar;
     });
-    if (widget.onChanged != null) {
-      widget.onChanged!(isParaLlevar);
-    }
+    widget.onChanged?.call(isParaLlevar);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildButton(
-          label: "Comer aquí",
-          icon: Icons.restaurant,
-          selected: !isParaLlevar,
-          onTap: () => toggle(false),
-        ),
-        const SizedBox(width: 16),
-        _buildButton(
-          label: "Para llevar",
-          icon: Icons.shopping_bag,
-          selected: isParaLlevar,
-          onTap: () => toggle(true),
-        ),
-      ],
+    // ✅ Si está deshabilitado, aplica una opacidad baja
+    return Opacity(
+      opacity: widget.enabled ? 1.0 : 0.5,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildButton(
+            label: "Comer aquí",
+            icon: Icons.restaurant,
+            selected: !isParaLlevar,
+            onTap: () => toggle(false),
+          ),
+          const SizedBox(width: 16),
+          _buildButton(
+            label: "Para llevar",
+            icon: Icons.shopping_bag,
+            selected: isParaLlevar,
+            onTap: () => toggle(true),
+          ),
+        ],
+      ),
     );
   }
 
@@ -62,7 +67,7 @@ class _ParaLlevarSwitchState extends State<ParaLlevarSwitch> {
     required VoidCallback onTap,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.enabled ? onTap : null, // ✅ Sin interacción si está deshabilitado
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(25),

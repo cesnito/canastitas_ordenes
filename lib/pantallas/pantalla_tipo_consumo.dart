@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ordenes/componentes/app_canastitas.dart';
 import 'package:ordenes/utils/constantes.dart';
+import 'package:ordenes/utils/mensajes.dart';
 import 'package:ordenes/widgets/para_llevar.dart';
 
 class TipoConsumoScreen extends StatefulWidget {
@@ -15,9 +16,8 @@ class _TipoConsumoScreenState extends State<TipoConsumoScreen> {
 
   void _confirmarSeleccion() {
     final mensaje = _isParaLlevar ? "Has elegido: Para llevar" : "Has elegido: Comer aquí";
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje),duration: Duration(seconds: 2)),
-    );
+    
+    Mensajes.show(context, mensaje);
 
     // Si quieres devolver el resultado a otra pantalla:
     // Navigator.pop(context, _isParaLlevar);

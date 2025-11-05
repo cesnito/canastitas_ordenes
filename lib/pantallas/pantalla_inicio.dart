@@ -135,7 +135,7 @@ class _PantallaHomeState extends State<PantallaHome> {
                           children: [
                             Container(
                               width: double.infinity,
-                              height: 140,
+                              height: 90,
                               child: Container(
                                 decoration: BoxDecoration(
                                   border: Border(
@@ -148,7 +148,7 @@ class _PantallaHomeState extends State<PantallaHome> {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      flex: 3,
+                                      flex: 25,
                                       child: Container(
                                         width: double.infinity,
                                         margin: EdgeInsets.all(2),
@@ -164,7 +164,7 @@ class _PantallaHomeState extends State<PantallaHome> {
                                       ),
                                     ),
                                     Expanded(
-                                      flex: 7,
+                                      flex: 75,
                                       child: Container(
                                         alignment: Alignment.centerLeft,
                                         padding: EdgeInsets.all(8),
@@ -180,7 +180,7 @@ class _PantallaHomeState extends State<PantallaHome> {
                                           children: [
                                             Text(
                                               "Orden #${orden.idOrden}",
-                                              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Constantes.colorPrimario),
+                                              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Constantes.colorPrimario),
                                             ),
                                             // Text(
                                             //   "Cliente: ${orden.cliente}",
@@ -190,10 +190,10 @@ class _PantallaHomeState extends State<PantallaHome> {
                                             //     color: Colors.white,
                                             //   ),
                                             // ),
-                                            Text(
-                                              "${orden.obtenerEstatusOrden()}",
-                                              style: TextStyle(fontSize: 20, color: Constantes.colorPrimario),
-                                            ),
+                                            // Text(
+                                            //   "${orden.obtenerEstatusOrden()}",
+                                            //   style: TextStyle(fontSize: 20, color: Constantes.colorPrimario),
+                                            // ),
                                             Text(
                                               "Total: \$${orden.total.toStringAsFixed(2)}",
                                               style: TextStyle(
@@ -310,7 +310,7 @@ class _PantallaHomeState extends State<PantallaHome> {
       ],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Haptic.sense();
+          Haptic.sense(); 
           Navigator.pushNamed(context, '/ordenar');
           // Navigator.pushNamed(context, '/tipoconsumo');
         },

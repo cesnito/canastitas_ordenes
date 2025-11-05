@@ -226,7 +226,7 @@ class AppCanastitasState extends State<AppCanastitas> {
             else if (index == 2) {
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/cobrar',
+                '/ordenes',
                 (Route<dynamic> route) => false,
               );
             }  
@@ -264,15 +264,15 @@ class AppCanastitasState extends State<AppCanastitas> {
             // if (index == 2) Navigator.pushReplacementNamed(context, '/perfil');
           },
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Ordenes'),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
             BottomNavigationBarItem(
               icon: Icon(Icons.list),
               label: 'Nueva orden',
             ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.attach_money),
-            //   label: 'Cobrar',
-            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.attach_money), 
+              label: 'Ordenes',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Cerrar sesión',

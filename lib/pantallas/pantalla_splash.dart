@@ -10,7 +10,7 @@ class CanastitasSplash extends StatefulWidget {
   late double logoSize;
 
   CanastitasSplash(
-      {this.duration = 2000, this.logoSize = 250.0});
+      {this.duration = 500, this.logoSize = 250.0});
 
   @override
   CanastitasSplashState createState() => CanastitasSplashState();
@@ -24,9 +24,9 @@ class CanastitasSplashState extends State<CanastitasSplash>
   @override
   void initState() {
     super.initState();
-    if (widget.duration < 1000) widget.duration = 2000;
+    if (widget.duration < 1000) widget.duration = 500;
     _animationController = new AnimationController(
-        vsync: this, duration: Duration(milliseconds: 1200));
+        vsync: this, duration: Duration(milliseconds: 300));
     _animation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
         parent: _animationController, curve: Curves.easeInCirc));
     _animationController.forward();

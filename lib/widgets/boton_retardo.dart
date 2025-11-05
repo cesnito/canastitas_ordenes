@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ordenes/utils/haptic.dart';
 
 class BotonCanastitasRetardo extends StatefulWidget {
   final Widget icon;
@@ -14,7 +15,7 @@ class BotonCanastitasRetardo extends StatefulWidget {
     required this.label,
     required this.color,
     required this.onLongPressConfirmed,
-    this.holdDuration = const Duration(milliseconds: 500), 
+    this.holdDuration = const Duration(milliseconds: 50), 
     this.enabled = true,
   });
 
@@ -62,8 +63,11 @@ class _BotonCanastitasRetardoState extends State<BotonCanastitasRetardo>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPressStart: widget.enabled ? _onLongPressStart : null,
-      onLongPressEnd: widget.enabled ? _onLongPressEnd : null,
+      // onLongPressStart: widget.enabled ? _onLongPressStart : null,
+      // onLongPressEnd: widget.enabled ? _onLongPressEnd : null,
+      // onTap: widget.enabled ? (){
+
+      // } : null,
       child: Stack(
         children: [
           // Barra de progreso en el fondo
@@ -77,7 +81,7 @@ class _BotonCanastitasRetardoState extends State<BotonCanastitasRetardo>
                     0.25 *
                     _controller.value,
                 decoration: BoxDecoration(
-                  color: widget.color.withAlpha((0.8 * 255).toInt()),
+                  color: widget.color,
                   borderRadius: BorderRadius.circular(8),
                 ),
               );
@@ -90,15 +94,18 @@ class _BotonCanastitasRetardoState extends State<BotonCanastitasRetardo>
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: widget.enabled
-                    ? widget.color.withAlpha(80)
-                    : widget.color.withAlpha(0),
+                    ? widget.color
+                    : widget.color,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               icon: widget.icon,
               label: widget.label,
-              onPressed: () {}, // bloquear toque normal
+              onPressed: (){
+                Haptic.sense();
+                widget.onLongPressConfirmed();
+              }, // bloquear toque normal
             ),
           ),
         ],

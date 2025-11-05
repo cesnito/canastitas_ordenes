@@ -1,7 +1,10 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ordenes/pantallas/pantalla_administrar_orden_cobrar.dart';
 import 'package:ordenes/pantallas/pantalla_administrar_orden_creada.dart';
+import 'package:ordenes/pantallas/pantalla_administrar_orden_muestra.dart';
 import 'package:ordenes/pantallas/pantalla_inicio.dart';
 import 'package:ordenes/pantallas/pantalla_iniciar_sesion.dart';
+import 'package:ordenes/pantallas/pantalla_mostrar_ordenes.dart';
 import 'package:ordenes/pantallas/pantalla_ordenar_producto.dart';
 import 'package:ordenes/pantallas/pantalla_splash.dart';
 import 'package:ordenes/pantallas/pantalla_tipo_consumo.dart';
@@ -51,13 +54,25 @@ class MyApp extends StatelessWidget {
     routes: {
       '/': (context) => CanastitasSplash(),
       '/login': (context) => PantallaInicioSesion(),
-      '/tipoconsumo': (context) => TipoConsumoScreen(),
+      '/tipoconsumo': (context) => TipoConsumoScreen(), 
       '/home': (context) => PantallaHome(), 
       '/ordenar': (context) => PantallaOrdenarProducto(),  
-      '/cobrar': (context) => PantallaOrdenarProducto(),  
+      '/ordenes': (context) => PantallaMostrarOrdenes(),   
+      '/detallesOrdenMuestra': (context) => PantallaDetallesOrdenMuestra(),   
       '/detallesOrdenCreada': (context) => PantallaDetallesOrdenCreada(),   
       '/detallesOrdenCobrar': (context) => PantallaDetallesOrdenCobrar(),   
     }, 
+    
+      locale: const Locale('es', 'ES'),
+      supportedLocales: const [
+        Locale('es', 'ES'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ]
     );
   }
 }

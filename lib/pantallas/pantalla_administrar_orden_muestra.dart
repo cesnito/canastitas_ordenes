@@ -2,25 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:ordenes/api/canastitas_api.dart';
 import 'package:ordenes/modelos/orden_tiempo_real.dart';
 import 'package:ordenes/modelos/producto.dart';
+import 'package:ordenes/pantallas/pantalla_detalle_producto.dart';
+import 'package:ordenes/pantallas/pantalla_ordenar_producto.dart';
 import 'package:ordenes/proveedores/carrito_proveedor.dart';
 import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:ordenes/utils/dialogo.dart';
+import 'package:ordenes/utils/haptic.dart';
 import 'package:ordenes/utils/mensajes.dart';
 import 'package:ordenes/widgets/boton_retardo.dart';
-import 'package:ordenes/widgets/metodo_pago.dart';
-import 'package:provider/provider.dart'; 
- 
-class PantallaDetallesOrdenCobrar extends StatefulWidget {
-  const PantallaDetallesOrdenCobrar({super.key});
+import 'package:ordenes/widgets/para_llevar.dart';
+import 'package:provider/provider.dart';
+
+class PantallaDetallesOrdenMuestra extends StatefulWidget {
+  const PantallaDetallesOrdenMuestra({super.key});
 
   @override
-  State<PantallaDetallesOrdenCobrar> createState() =>
-      PantallaDetallesOrdenCobrarState();
+  State<PantallaDetallesOrdenMuestra> createState() =>
+      PantallaDetallesOrdenMuestraState();
 }
 
-class PantallaDetallesOrdenCobrarState
-    extends State<PantallaDetallesOrdenCobrar> {
+class PantallaDetallesOrdenMuestraState
+    extends State<PantallaDetallesOrdenMuestra> {
   final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _orderNotesController = TextEditingController();
 
@@ -128,6 +131,90 @@ class PantallaDetallesOrdenCobrarState
     _customerNameController.dispose();
     _orderNotesController.dispose();
     super.dispose();
+  }
+
+  void _confirmarEdicionOrden() {
+    final BuildContext dialogContext = context;
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Confirmar Modificación"),
+        content: const Text("¿Confirmar que la orden se ha modificado?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Haptic.sense();
+              Navigator.pop(context);
+              //Navigator.pushReplacementNamed(context, '/home');
+            },
+            child: const Text("Cancelar"),
+          ),
+          BotonCanastitasRetardo(
+            icon: Icon(Icons.delivery_dining, color: Constantes.colorPrimario),
+            label: Text(
+              'Confirmar',
+              style: TextStyle(color: Constantes.colorPrimario),
+            ),
+            color: Colors.black,
+            onLongPressConfirmed: () {
+              final cart = Provider.of<CartProvider>(
+                dialogContext,
+                listen: false,
+              );
+              cart.setEditingMode(true);
+
+              if (cart.cartItems.isEmpty) {
+                Mensajes.show(dialogContext, "El carrito está vacío");
+                return;
+              }
+              Navigator.pop(dialogContext);
+              Dialogo.cargando(dialogContext, "Editando orden...");
+              try {
+                final sesion = Provider.of<SesionProvider>(
+                  dialogContext,
+                  listen: false,
+                ).session!;
+                CanastitasAPI api = CanastitasAPI(usuario: sesion);
+
+                final pedidoData = {
+                  'idOrden': idOrden,
+                  'cliente': cliente,
+                  'notas': anotaciones,
+                  'esParaLlevar': paraLlevar,
+                  'metodoPago': metodoPago,
+                  'idMesa': selectedMesa,
+                  'productos': cart.cartItems,
+                  'total': cart.totalPrice,
+                };
+
+                api.editarPedido(
+                  pedidoData,
+                  onSuccess: (response) {
+                    Navigator.pop(dialogContext);
+                    print('Orden editada con éxito');
+                    Mensajes.show(dialogContext, "Orden editada con éxito");
+                    cart.clearCart();
+                    _customerNameController.clear();
+                    _orderNotesController.clear();
+
+                    Navigator.pushReplacementNamed(dialogContext, '/home');
+                  },
+                  onError: (error) {
+                    Navigator.pop(dialogContext);
+                    Mensajes.show(dialogContext, "Error al realizar la orden: ${error.error.descripcion}");
+                  },
+                );
+              } catch (e) {
+                Navigator.pop(
+                  dialogContext,
+                ); // cerrar diálogo en caso de error también
+                Mensajes.show(dialogContext, "Error: $e");
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _cancelarOrden() {
@@ -314,19 +401,19 @@ class PantallaDetallesOrdenCobrarState
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     cart.setEditingMode(true);
- 
-    final String titulo = "Cobrar orden '${cliente}' ${idOrden}";
+
+    final String titulo = "Orden '${cliente}' ${idOrden}";
 
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: Text(titulo)),
+        appBar: AppBar(title: Text(titulo),backgroundColor: Colors.blue,), 
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (cart.cartItems.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text(titulo)),
+        appBar: AppBar(title: Text(titulo), backgroundColor: Constantes.colorSecundario,), 
         body: const Center(child: Text("El carrito está vacío")),
       );
     }
@@ -334,13 +421,32 @@ class PantallaDetallesOrdenCobrarState
       canPop: false, // Evita que se cierre solo
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
+          final salir = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("¿Salir?"),
+              content: const Text("¿Seguro que quieres regresar?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text("No"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text("Sí"),
+                ),
+              ],
+            ),
+          );
+          if (salir == true) {
             Navigator.pop(context);
+          }
         }
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Constantes.colorPrimario,
-          title: Text(titulo),
+          backgroundColor: Constantes.ordenLista,
+          title: Text(titulo), 
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -480,15 +586,6 @@ class PantallaDetallesOrdenCobrarState
                             Column(children: []),
                         ],
                       ),
-                      trailing:
-                          (ordenRecibida.ordenLista() ||
-                              ordenRecibida.ordenPreparandose())
-                          ? Wrap(children: [], spacing: 4)
-                          : Wrap(
-                              spacing: 4,
-                              children: [
-                              ],
-                            ),
                     ),
                   );
                 },
@@ -501,71 +598,12 @@ class PantallaDetallesOrdenCobrarState
                 ),
               ),
 
-              // (!ordenRecibida.ordenLista())
-              //     ? (ordenRecibida.ordenPreparandose())
-              //           ? Container(
-              //               padding: EdgeInsets.symmetric(
-              //                 vertical: 16,
-              //                 horizontal: 24,
-              //               ),
-              //               decoration: BoxDecoration(
-              //                 color: Colors.red[100],
-              //                 borderRadius: BorderRadius.circular(12),
-              //                 boxShadow: [
-              //                   BoxShadow(
-              //                     color: Colors.red.withOpacity(0.4),
-              //                     blurRadius: 8,
-              //                     offset: Offset(0, 3),
-              //                   ),
-              //                 ],
-              //               ),
-              //               child: Row(
-              //                 mainAxisSize: MainAxisSize.min,
-              //                 children: [
-              //                   Text(
-              //                     "🚫 No puedes editar productos\nde una orden en preparación",
-              //                     style: TextStyle(
-              //                       fontSize: 18,
-              //                       fontWeight: FontWeight.bold,
-              //                       color: Colors.red[900],
-              //                     ),
-              //                   ),
-              //                   SizedBox(width: 8),
-              //                   Text(
-              //                     "😞", // Emoji triste
-              //                     style: TextStyle(fontSize: 26),
-              //                   ),
-              //                 ],
-              //               ),
-              //             )
-              //           : ElevatedButton.icon(
-              //               icon: Icon(Icons.add),
-              //               label: Text('Agregar producto'),
-              //               onPressed: () {
-              //                 Haptic.sense();
-              //                 // Navigator.pushNamed(
-              //                 //   context,
-              //                 //   '/ordenar',
-              //                 //   arguments: {
-              //                 //     'esEdicion': true, // pasa el flag para saber modo
-              //                 //   },
-              //                 // );
-              //                 Navigator.push(
-              //                   context,
-              //                   MaterialPageRoute(
-              //                     builder: (context) =>
-              //                         PantallaOrdenarProducto(esEdicion: true),
-              //                   ),
-              //                 );
-              //               },
-              //             )
-              //     : Container(),
-
               const SizedBox(height: 20),
 
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: DropdownButtonFormField<int>(
+                  onTap: null,
                   value: selectedMesa,
                   decoration: const InputDecoration(
                     labelText: "Número de Mesa",
@@ -577,7 +615,7 @@ class PantallaDetallesOrdenCobrarState
                       child: Text(mesa["nombre"]),
                     );
                   }).toList(),
-                  onChanged: null, 
+                  onChanged: null
                 ),
               ),
               const SizedBox(height: 10),
@@ -606,42 +644,37 @@ class PantallaDetallesOrdenCobrarState
               ),
               const SizedBox(height: 20),
 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Método de pago",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      MetodoPagoSwitch(
-                        metodoPagoPorDefecto: metodoPago,
-                        onChanged: (metodoPagoSeleccionado) {
-                          metodoPago = metodoPagoSeleccionado; 
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+              ParaLlevarSwitch(
+                enabled: false,
+                isParaLlevarPorDefecto: paraLlevar,
+                onChanged: (estado) {
+                  paraLlevar = estado;
+                },
               ),
-
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   BotonCanastitasRetardo(
-                    icon: Icon(Icons.delivery_dining, color: Colors.white),
+                    enabled: !ordenRecibida.ordenLista(),
+                    icon: Icon(Icons.cancel, color: Colors.white),
                     label: Text(
-                      'Finalizar',
+                      'Regresar',
                       style: TextStyle(color: Colors.white),
                     ),
-                    color: Colors.green,
-                    onLongPressConfirmed: _entregarOrden,
+                    color: Constantes.ordenLista,
+                    onLongPressConfirmed: (){
+                      Haptic.sense();
+                      Navigator.of(context).pop();
+                    //   Navigator.pushNamedAndRemoveUntil(
+                    //   context,
+                    //   '/ordenes',
+                    //   (Route<dynamic> route) => false,
+                    // );
+                    },
                   ),
+                  // BotonCanastitas(texto: "Confirmar", onPressed: (){})
                 ],
               ),
             ],

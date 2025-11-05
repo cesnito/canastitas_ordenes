@@ -6,6 +6,7 @@ class BotonCanastitas extends StatelessWidget {
   final VoidCallback onPressed;
   final double? altura;
   final IconData? icono;
+  final bool enabled;
 
   const BotonCanastitas({
     Key? key,
@@ -13,17 +14,18 @@ class BotonCanastitas extends StatelessWidget {
     required this.onPressed,
     this.icono,
     this.altura,
+    this.enabled = true
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       icon: Icon(icono, color: Constantes.colorSecundario,),  
-      onPressed: onPressed,
+      onPressed: (enabled) ? onPressed: null, 
       label: Text(texto, style: TextStyle(color: Constantes.colorSecundario),),
       style: ElevatedButton.styleFrom(
         minimumSize: Size.fromHeight(altura ?? 45),
-        backgroundColor: Constantes.colorPrimario
+        backgroundColor: Constantes.colorPrimario,
       ),
     );
   }

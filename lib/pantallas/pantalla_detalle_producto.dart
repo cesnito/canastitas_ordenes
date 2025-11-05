@@ -7,6 +7,7 @@ import 'package:ordenes/tipos_productos/personalizable.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:ordenes/utils/dialogo.dart';
 import 'package:ordenes/utils/haptic.dart';
+import 'package:ordenes/utils/mensajes.dart';
 import 'package:ordenes/widgets/boton.dart';
 import 'package:provider/provider.dart';
 
@@ -272,13 +273,7 @@ class _PantallaDetallesProductoState extends State<PantallaDetallesProducto> {
       cartProvider.addToCart(updatedProduct);
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          "${productoDetalle.nombre} agregado/actualizado en el carrito",
-        ),duration: Duration(seconds: 2)
-      ),
-    );
+    Mensajes.show(context, "${productoDetalle.nombre} agregado/actualizado en el carrito");
     Navigator.pop(context);
   }
 

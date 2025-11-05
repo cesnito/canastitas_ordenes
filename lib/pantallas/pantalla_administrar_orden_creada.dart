@@ -9,6 +9,8 @@ import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:ordenes/utils/dialogo.dart';
 import 'package:ordenes/utils/haptic.dart';
+import 'package:ordenes/utils/mensajes.dart';
+import 'package:ordenes/widgets/boton.dart';
 import 'package:ordenes/widgets/boton_retardo.dart';
 import 'package:ordenes/widgets/metodo_pago.dart';
 import 'package:ordenes/widgets/para_llevar.dart';
@@ -120,9 +122,7 @@ class PantallaDetallesOrdenCreadaState
       setState(() {
         _loading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al cargar detalles: $e'),duration: Duration(seconds: 2)));
+      Mensajes.show(context, 'Error al cargar detalles: $e');
     }
   }
 
@@ -145,6 +145,7 @@ class PantallaDetallesOrdenCreadaState
         actions: [
           TextButton(
             onPressed: () {
+              Haptic.sense();
               Navigator.pop(context);
               //Navigator.pushReplacementNamed(context, '/home');
             },
@@ -165,9 +166,7 @@ class PantallaDetallesOrdenCreadaState
               cart.setEditingMode(true);
 
               if (cart.cartItems.isEmpty) {
-                ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  const SnackBar(content: Text("El carrito está vacío"),duration: Duration(seconds: 2)),
-                );
+                Mensajes.show(dialogContext, "El carrito está vacío");
                 return;
               }
               Navigator.pop(dialogContext);
@@ -195,10 +194,7 @@ class PantallaDetallesOrdenCreadaState
                   onSuccess: (response) {
                     Navigator.pop(dialogContext);
                     print('Orden editada con éxito');
-                    // Aquí actualiza UI, limpia carrito, etc.
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      const SnackBar(content: Text("Orden editada con éxito"),duration: Duration(seconds: 2)),
-                    );
+                    Mensajes.show(dialogContext, "Orden editada con éxito");
                     cart.clearCart();
                     _customerNameController.clear();
                     _orderNotesController.clear();
@@ -207,22 +203,14 @@ class PantallaDetallesOrdenCreadaState
                   },
                   onError: (error) {
                     Navigator.pop(dialogContext);
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "Error al realizar la orden: ${error.error.descripcion}",
-                        ),duration: Duration(seconds: 2)
-                      ),
-                    );
+                    Mensajes.show(dialogContext, "Error al realizar la orden: ${error.error.descripcion}");
                   },
                 );
               } catch (e) {
                 Navigator.pop(
                   dialogContext,
                 ); // cerrar diálogo en caso de error también
-                ScaffoldMessenger.of(
-                  dialogContext,
-                ).showSnackBar(SnackBar(content: Text("Error: $e"),duration: Duration(seconds: 2)));
+                Mensajes.show(dialogContext, "Error: $e");
               }
             },
           ),
@@ -275,9 +263,7 @@ class PantallaDetallesOrdenCreadaState
               onLongPressConfirmed: () {
                 final motivo = motivoController.text.trim();
                 if (motivo.isEmpty) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text('Por favor ingresa un motivo'),duration: Duration(seconds: 2)),
-                  );
+                  Mensajes.show(dialogContext, 'Por favor ingresa un motivo');
                   return;
                 }
 
@@ -288,11 +274,7 @@ class PantallaDetallesOrdenCreadaState
                 cart.setEditingMode(true);
 
                 if (cart.cartItems.isEmpty) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(
-                      content: Text("No puedes cancelar con carrito vacío"),duration: Duration(seconds: 2)
-                    ),
-                  );
+                  Mensajes.show(dialogContext, "No puedes cancelar con carrito vacío");
                   return;
                 }
                 Navigator.pop(dialogContext);
@@ -316,12 +298,7 @@ class PantallaDetallesOrdenCreadaState
                     onSuccess: (response) {
                       Navigator.pop(dialogContext);
                       print('Orden cancelada con éxito');
-                      // Aquí actualiza UI, limpia carrito, etc.
-                      ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        const SnackBar(
-                          content: Text("Orden cancelada con éxito"),duration: Duration(seconds: 2)
-                        ),
-                      );
+                      Mensajes.show(dialogContext, "Orden cancelada con éxito");
                       cart.clearCart();
                       _customerNameController.clear();
                       _orderNotesController.clear();
@@ -334,20 +311,12 @@ class PantallaDetallesOrdenCreadaState
                     },
                     onError: (error) {
                       Navigator.pop(dialogContext);
-                      ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            "Error al cancelar la orden: ${error.error.descripcion}",
-                          ),duration: Duration(seconds: 2)
-                        ),
-                      );
+                      Mensajes.show(dialogContext, "Error al cancelar la orden: ${error.error.descripcion}");
                     },
                   );
                 } catch (e) {
                   Navigator.pop(dialogContext);
-                  ScaffoldMessenger.of(
-                    dialogContext,
-                  ).showSnackBar(SnackBar(content: Text("Error: $e"),duration: Duration(seconds: 2)));
+                  Mensajes.show(dialogContext, "Error: $e");
                 }
               },
             ),
@@ -384,11 +353,7 @@ class PantallaDetallesOrdenCreadaState
               cart.setEditingMode(true);
 
               if (cart.cartItems.isEmpty) {
-                ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  const SnackBar(
-                    content: Text("No puedes entregar con carrito vacío"),duration: Duration(seconds: 2)
-                  ),
-                );
+                Mensajes.show(dialogContext, "No puedes entregar con carrito vacío");
                 return;
               }
               Navigator.pop(dialogContext);
@@ -407,12 +372,7 @@ class PantallaDetallesOrdenCreadaState
                   onSuccess: (response) {
                     Navigator.pop(dialogContext);
                     print('Orden entregada con éxito');
-                    // Aquí actualiza UI, limpia carrito, etc.
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      const SnackBar(
-                        content: Text("Orden entregada con éxito"),duration: Duration(seconds: 2)
-                      ),
-                    );
+                    Mensajes.show(dialogContext, "Orden entregada con éxito");
                     cart.clearCart();
                     _customerNameController.clear();
                     _orderNotesController.clear();
@@ -425,20 +385,12 @@ class PantallaDetallesOrdenCreadaState
                   },
                   onError: (error) {
                     Navigator.pop(dialogContext);
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "Error al entregar la orden: ${error.error.descripcion}",
-                        ),duration: Duration(seconds: 2)
-                      ),
-                    );
+                    Mensajes.show(dialogContext, "Error al entregar la orden: ${error.error.descripcion}");
                   },
                 );
               } catch (e) {
                 Navigator.pop(dialogContext);
-                ScaffoldMessenger.of(
-                  dialogContext,
-                ).showSnackBar(SnackBar(content: Text("Error: $e"),duration: Duration(seconds: 2)));
+                Mensajes.show(dialogContext, "Error: $e");
               }
             },
           ),
@@ -557,13 +509,7 @@ class PantallaDetallesOrdenCreadaState
                     direction: DismissDirection.endToStart,
                     onDismissed: (_) {
                       cart.removeFromCart(product);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            "${product.nombre} eliminado del carrito",
-                          ),duration: Duration(seconds: 2)
-                        ),
-                      );
+                      Mensajes.show(context, "${product.nombre} eliminado del carrito");
                     },
                     child: ListTile(
                       leading: Image.network(product.imagen, width: 50),
@@ -694,15 +640,7 @@ class PantallaDetallesOrdenCreadaState
                                             onPressed: () {
                                               cart.removeFromCart(product);
                                               Navigator.pop(context);
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    "${product.nombre} eliminado del carrito",
-                                                  ),duration: Duration(seconds: 2)
-                                                ),
-                                              );
+                                              Mensajes.show(context, "${product.nombre} eliminado del carrito");
                                             },
                                           ),
                                         ],
@@ -830,6 +768,7 @@ class PantallaDetallesOrdenCreadaState
                     color: Colors.red,
                     onLongPressConfirmed: _cancelarOrden,
                   ),
+                  // BotonCanastitas(texto: "Confirmar", onPressed: (){})
                 ],
               ),
             ],

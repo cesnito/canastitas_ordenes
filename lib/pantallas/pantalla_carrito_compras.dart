@@ -7,6 +7,7 @@ import 'package:ordenes/proveedores/sesion_provider.dart';
 import 'package:ordenes/utils/constantes.dart';
 import 'package:ordenes/utils/dialogo.dart';
 import 'package:ordenes/utils/haptic.dart';
+import 'package:ordenes/utils/mensajes.dart';
 import 'package:ordenes/widgets/boton.dart';
 import 'package:ordenes/widgets/boton_retardo.dart';
 import 'package:ordenes/widgets/para_llevar.dart';
@@ -51,19 +52,42 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
         title: const Text("Confirmar Orden"),
         content: const Text("¿Desea confirmar la orden?"),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context), // Cancelar
-            child: const Text("Cancelar"),
-          ),
-          BotonCanastitasRetardo(
-            icon: Icon(Icons.shopping_cart_rounded),
-            label: Text("Confirmar"),
-            color: Constantes.colorSecundario,
-            onLongPressConfirmed: () {
+          // TextButton(
+          //   onPressed: () => Navigator.pop(context), // Cancelar
+          //   child: const Text("Cancelar"),
+          // ),
+          // BotonCanastitasRetardo(
+          //   icon: Icon(Icons.shopping_cart_rounded),
+          //   label: Text("Confirmar"),
+          //   color: Constantes.colorSecundario,
+          //   onLongPressConfirmed: () {
+          //     Navigator.pop(context); // Cierra confirmación
+          //     _realizarOrden(); // Va a enviar
+          //   },
+          // ),
+          BotonCanastitas(
+            texto: "Cancelar",
+            onPressed: () {
               Navigator.pop(context); // Cierra confirmación
-              _realizarOrden(); // Va a enviar
             },
+            icono: Icons.shopping_cart_rounded,
           ),
+          BotonCanastitas(
+            texto: "Confirmar",
+            onPressed: () {
+              Navigator.pop(context); // Cierra confirmación
+              _realizarOrden(); // Va a enviar 
+            },
+            icono: Icons.shopping_cart_rounded,
+          ),
+          // BotonCanastitas(
+          //   texto: "Confirmar",
+          //   onPressed: () {
+          //     Navigator.pop(context); // Cierra confirmación
+          //     _realizarOrden(); // Va a enviar 
+          //   },
+          //   icono: Icons.shopping_cart_rounded,
+          // ),
         ],
       ),
     );
@@ -74,17 +98,11 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
     cart.setEditingMode(false);
 
     if (cart.cartItems.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("El carrito está vacío")));
+      Mensajes.show(context, "El carrito está vacío");
       return;
     }
     if (cliente.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Por favor ingresa el nombre del cliente"),duration: Duration(seconds: 2)
-        ),
-      );
+      Mensajes.show(context, "Por favor ingresa el nombre del cliente");
       return;
     }
     Dialogo.cargando(context, "Realizando orden...");
@@ -109,9 +127,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
         onSuccess: (response) {
           Navigator.pop(context);
           print('Orden realizada con éxito');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Orden realizada con éxito"),duration: Duration(seconds: 2)),
-          );
+          Mensajes.show(context, "Orden realizada con éxito");
           cart.clearCart();
           _customerNameController.clear();
           _orderNotesController.clear();
@@ -124,20 +140,15 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
         },
         onError: (error) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "Error al realizar la orden: ${error.error.descripcion}",
-              ),duration: Duration(seconds: 2)
-            ),
+          Mensajes.show(
+            context,
+            "Error al realizar la orden: ${error.error.descripcion}",
           );
         },
       );
     } catch (e) {
       Navigator.pop(context); // cerrar diálogo en caso de error también
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e"),duration: Duration(seconds: 2)));
+      Mensajes.show(context, "Error: $e");
     }
   }
 
@@ -214,12 +225,9 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
                   direction: DismissDirection.endToStart,
                   onDismissed: (_) {
                     cart.removeFromCart(product);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "${product.nombre} eliminado del carrito",
-                        ),duration: Duration(seconds: 2)
-                      ),
+                    Mensajes.show(
+                      context,
+                      "${product.nombre} eliminado del carrito",
                     );
                   },
                   child: ListTile(
@@ -324,14 +332,9 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
                                       Haptic.sense();
                                       cart.removeFromCart(product);
                                       Navigator.pop(context);
-                                      ScaffoldMessenger.of(
+                                      Mensajes.show(
                                         context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            "${product.nombre} eliminado del carrito",
-                                          ),duration: Duration(seconds: 2)
-                                        ),
+                                        "${product.nombre} eliminado del carrito",
                                       );
                                     },
                                   ),
@@ -412,7 +415,10 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
 
             BotonCanastitas(
               texto: "Finalizar compra",
-              onPressed: _confirmarOrden,
+              // onPressed: _confirmarOrden,
+              onPressed: (){
+                _realizarOrden();
+              }
             ),
           ],
         ),

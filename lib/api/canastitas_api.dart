@@ -19,10 +19,7 @@ class CanastitasAPI {
     required void Function(APIResponse) onSuccess,
     required void Function(APIResponse) onError,
   }) async {
-    final data = {
-      'usuario': usuario,
-      'password': password
-    };
+    final data = {'usuario': usuario, 'password': password};
 
     final response = await api.post('sesion/iniciar', data);
     try {
@@ -161,7 +158,7 @@ class CanastitasAPI {
     }
   }
 
-   Future<void> actualizaEstatusOrden(
+  Future<void> actualizaEstatusOrden(
     Map<String, dynamic> ordenData, {
     required void Function(APIResponse) onSuccess,
     required void Function(APIResponse) onError,
@@ -192,9 +189,7 @@ class CanastitasAPI {
     required void Function(APIResponse) onSuccess,
     required void Function(APIResponse) onError,
   }) async {
-    final orden = {
-      'idOrden': idOrden
-    };
+    final orden = {'idOrden': idOrden};
 
     final response = await api.post(
       'ordenes/detalles',
@@ -225,6 +220,34 @@ class CanastitasAPI {
     final response = await api.post(
       'productos/disponibilidad',
       ordenData,
+      token: usuario!.token,
+    );
+    try {
+      if (response.estatus == 200) {
+        onSuccess(response);
+      } else {
+        onError(response);
+      }
+    } catch (e) {
+      print("Fallo aqui");
+      print(e);
+      print("Fallo aqui");
+      var res = APIResponse();
+      res.error = APIError(descripcion: e.toString());
+      onError(APIResponse());
+    }
+  }
+
+  Future<void> obtenerOrdenes(
+    String fecha, {
+    required void Function(APIResponse) onSuccess,
+    required void Function(APIResponse) onError,
+  }) async {
+    final datax = {'fecha': fecha};
+
+    final response = await api.post(
+      'ordenes/obtener',
+      datax,  
       token: usuario!.token,
     );
     try {

@@ -7,6 +7,7 @@ Widget cargarImagen(String source, {BoxFit fit = BoxFit.cover}) {
   if (source.startsWith('http://') || source.startsWith('https://')) {
     return Image.network(
       source,
+      width: 60,  
       fit: fit,
       errorBuilder: (context, error, stackTrace) {
         return const Icon(Icons.broken_image, size: 50);
