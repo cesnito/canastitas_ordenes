@@ -266,6 +266,34 @@ class CanastitasAPI {
     }
   }
 
+  Future<void> obtenerOrdenes2(
+    String fecha, {
+    required void Function(APIResponse) onSuccess,
+    required void Function(APIResponse) onError,
+  }) async {
+    final datax = {'fecha': fecha};
+
+    final response = await api.post(
+      'ordenes/obtener2',
+      datax,  
+      token: usuario!.token,
+    );
+    try {
+      if (response.estatus == 200) {
+        onSuccess(response);
+      } else {
+        onError(response);
+      }
+    } catch (e) {
+      print("Fallo aqui");
+      print(e);
+      print("Fallo aqui");
+      var res = APIResponse();
+      res.error = APIError(descripcion: e.toString());
+      onError(APIResponse());
+    }
+  }
+
   // Future<List<dynamic>> obtenerOrdenes(String token) async {
   //   final response = await api.get('/ordenes/curso', token: token);
   //   return response['data'];

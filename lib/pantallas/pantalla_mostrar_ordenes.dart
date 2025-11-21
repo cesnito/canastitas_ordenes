@@ -4,6 +4,7 @@ import 'package:ordenes/api/canastitas_api.dart';
 import 'package:ordenes/componentes/app_canastitas.dart';
 import 'package:ordenes/modelos/ordenmuestra.dart';
 import 'package:ordenes/modelos/producto.dart';
+import 'package:ordenes/modelos/stats_ordenes.dart';
 import 'package:ordenes/pantallas/pantalla_carrito_compras.dart';
 import 'package:ordenes/proveedores/carrito_proveedor.dart';
 import 'package:ordenes/proveedores/sesion_provider.dart';
@@ -34,6 +35,8 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
   late bool estaCargando;
   double totalFiltrado = 0.0;
 
+  EstadisticasOrdenes? estadisticas;
+
   @override
   void initState() {
     super.initState();
@@ -58,11 +61,19 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
 
     final String fechaFormato = DateFormat('yyyy-MM-dd').format(selectedDate);
 
-    api.obtenerOrdenes(
+    api.obtenerOrdenes2(
       fechaFormato,
       onSuccess: (res) {
         estaCargando = false;
-        final List<dynamic> ordenes = res.data;
+
+        final data = res.data;
+
+        // 🔥 obtener stats
+        estadisticas = EstadisticasOrdenes.fromJson(data["stats"]);
+
+        // órdenes
+        final List<dynamic> ordenes = data["ordenes"];
+
         List<OrdenMuestra> all = ordenes
             .map((item) => OrdenMuestra.fromJson(item))
             .toList();
@@ -143,10 +154,47 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
     final horaPrimera = DateFormat('hh:mm a').format(fechaPrimera);
     final horaUltima = DateFormat('hh:mm a').format(fechaUltima);
 
-    print('Primera orden a las: $horaPrimera');
-    print('Última orden a las: $horaUltima');
+    // print('Primera orden a las: $horaPrimera');
+    // print('Última orden a las: $horaUltima');
     return "${horaPrimera} / ${horaUltima}";
   }
+
+  Widget _buildStatItem(String icono, int valor) {
+  return Container(
+    width: 120, // ancho sugerido
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.black12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center, // 🔹 centra verticalmente
+      children: [
+        Text(icono, style: const TextStyle(fontSize: 26)),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Center(
+            child: Text(
+              valor.toString(),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -240,6 +288,62 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              if (estadisticas != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+
+                      Wrap(
+  spacing: 12,
+  runSpacing: 12,
+  children: [
+    _buildStatItem("🍔", estadisticas!.hamburguesas),
+    _buildStatItem("🌭", estadisticas!.hotdogs),
+    _buildStatItem("🍟", estadisticas!.papasfritas),
+    _buildStatItem("3×50", estadisticas!.combos3x50),
+    _buildStatItem("3×80", estadisticas!.combos3x80),
+    _buildStatItem("🍔+🍟", estadisticas!.paquetehamburguesapapas),
+  ],
+),
+                      // Column(
+                      //   children: [
+                      //     _rowStat(
+                      //       "🍔",
+                      //       "Hamburguesas",
+                      //       estadisticas!.hamburguesas,
+                      //     ),
+                      //     _rowStat("🌭", "Hot Dogs", estadisticas!.hotdogs),
+                      //     _rowStat(
+                      //       "🍟",
+                      //       "Papas Fritas",
+                      //       estadisticas!.papasfritas,
+                      //     ),
+                      //     _rowStat(
+                      //       "3×50",
+                      //       "Combo 3x50",
+                      //       estadisticas!.combos3x50,
+                      //     ),
+                      //     _rowStat(
+                      //       "3×80",
+                      //       "Combo 3x80",
+                      //       estadisticas!.combos3x80,
+                      //     ),
+                      //     _rowStat(
+                      //       "🍔+🍟",
+                      //       "Paquete H + P",
+                      //       estadisticas!.paquetehamburguesapapas,
+                      //     ),
+                      //   ],
+                      // ),
+                    ],
+                  ),
+                ),
 
               // 🔍 Buscador
               Padding(
