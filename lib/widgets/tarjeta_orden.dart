@@ -6,7 +6,8 @@ import 'package:ordenes/utils/constantes.dart';
 class TarjetaOrden extends StatelessWidget {
   final OrdenMuestra order;
   final VoidCallback? click;
-  const TarjetaOrden({Key? key, required this.order, this.click}) : super(key: key);
+  const TarjetaOrden({Key? key, required this.order, this.click})
+    : super(key: key);
 
   Color _getColorByStatus() {
     switch (order.statusOrden) {
@@ -54,9 +55,10 @@ class TarjetaOrden extends StatelessWidget {
     DateTime fecha = DateFormat('yyyy-MM-dd HH:mm:ss').parse(order.creado);
 
     DateTime hoy = DateTime.now();
-    bool esHoy = fecha.year == hoy.year &&
-                  fecha.month == hoy.month &&
-                  fecha.day == hoy.day;
+    bool esHoy =
+        fecha.year == hoy.year &&
+        fecha.month == hoy.month &&
+        fecha.day == hoy.day;
 
     return GestureDetector(
       onTap: click,
@@ -66,11 +68,7 @@ class TarjetaOrden extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(
-              color: sombra,
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
+            BoxShadow(color: sombra, blurRadius: 8, offset: const Offset(0, 3)),
           ],
         ),
         child: Padding(
@@ -85,11 +83,7 @@ class TarjetaOrden extends StatelessWidget {
                   color: colorStatus.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  _getIconByStatus(),
-                  color: colorStatus,
-                  size: 20,
-                ),
+                child: Icon(_getIconByStatus(), color: colorStatus, size: 20),
               ),
               const SizedBox(width: 12),
 
@@ -113,11 +107,17 @@ class TarjetaOrden extends StatelessWidget {
                     // Cliente
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 18, color: Colors.black54),
+                        const Icon(
+                          Icons.person,
+                          size: 18,
+                          color: Colors.black54,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            order.nombreCliente.isEmpty ? "Cliente desconocido" : order.nombreCliente,
+                            order.nombreCliente.isEmpty
+                                ? "Cliente desconocido"
+                                : order.nombreCliente,
                             style: const TextStyle(
                               fontSize: 15,
                               color: Colors.black87,
@@ -133,12 +133,18 @@ class TarjetaOrden extends StatelessWidget {
 
                     // Fecha
                     Row(
-                      children: [ 
-                        const Icon(Icons.date_range, size: 18, color: Colors.black54),
+                      children: [
+                        const Icon(
+                          Icons.date_range,
+                          size: 18,
+                          color: Colors.black54,
+                        ),
                         const SizedBox(width: 4),
-                        Expanded(  
-                          child: Text( 
-                             DateFormat(esHoy ? 'hh:mm:ss a' : 'dd/MM/yyyy hh:mm:ss a').format(fecha),
+                        Expanded(
+                          child: Text(
+                            DateFormat(
+                              esHoy ? 'hh:mm:ss a' : 'dd/MM/yyyy hh:mm:ss a',
+                            ).format(fecha),
                             style: const TextStyle(
                               fontSize: 15,
                               color: Colors.black87,
@@ -150,12 +156,16 @@ class TarjetaOrden extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 6), 
+                    const SizedBox(height: 6),
 
                     // Total
                     Row(
                       children: [
-                        const Icon(Icons.attach_money, size: 18, color: Colors.green),
+                        const Icon(
+                          Icons.attach_money,
+                          size: 18,
+                          color: Colors.green,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           order.total.toStringAsFixed(2),
@@ -167,20 +177,63 @@ class TarjetaOrden extends StatelessWidget {
                         ),
                       ],
                     ),
+                    Row(
+                      children: [
+                        Icon(
+                          order.getIconoMetodoPago(),
+                          size: 20,
+                          color: Constantes.colorPrimario,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          order.estatusMetodoPago,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Constantes.colorPrimario,
+                          ),
+                        ),
+                      ],
+                    ),
 
-                    const SizedBox(height: 6),
+                    // Tiempo de la orden
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.timer,
+                          size: 20,
+                          color: Colors.blueGrey,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          order.tiempoQueTomo(),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blueGrey,
+                          ),
+                        ),
+                      ],
+                    ),
 
                     // Notas
                     if (order.notas.isNotEmpty)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.note_alt, size: 18, color: Colors.black54),
+                          const Icon(
+                            Icons.note_alt,
+                            size: 18,
+                            color: Colors.black54,
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               order.notas,
-                              style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         ],
@@ -190,7 +243,10 @@ class TarjetaOrden extends StatelessWidget {
 
                     // Estatus
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: colorStatus.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -210,7 +266,11 @@ class TarjetaOrden extends StatelessWidget {
 
               // Botón detalles
               IconButton(
-                icon: Icon(Icons.arrow_forward_ios_rounded, color: Constantes.colorPrimario, size: 28),
+                icon: Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Constantes.colorPrimario,
+                  size: 28,
+                ),
                 onPressed: click,
               ),
             ],

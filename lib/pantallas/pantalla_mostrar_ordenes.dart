@@ -37,6 +37,8 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
 
   EstadisticasOrdenes? estadisticas;
 
+  int metodoPagoSeleccionado = 0;
+
   @override
   void initState() {
     super.initState();
@@ -108,11 +110,31 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
     }
   }
 
+  // void _filterProducts(String query) {
+  //   final lowerQuery = query.toLowerCase();
+  //   final resultados = orders
+  //       .where((p) => p.nombreCliente.toLowerCase().contains(lowerQuery))
+  //       .toList();
+
+  //   setState(() {
+  //     searchQuery = query;
+  //     filteredOrders = resultados;
+  //     _calcularTotal();
+  //   });
+  // }
+
   void _filterProducts(String query) {
     final lowerQuery = query.toLowerCase();
-    final resultados = orders
-        .where((p) => p.nombreCliente.toLowerCase().contains(lowerQuery))
-        .toList();
+
+    final resultados = orders.where((p) {
+      final coincideNombre = p.nombreCliente.toLowerCase().contains(lowerQuery);
+
+      final coincideMetodo =
+          (metodoPagoSeleccionado == 0) ||
+          (p.metodoPago == metodoPagoSeleccionado);
+
+      return coincideNombre && coincideMetodo;
+    }).toList();
 
     setState(() {
       searchQuery = query;
@@ -159,42 +181,72 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
     return "${horaPrimera} / ${horaUltima}";
   }
 
-  Widget _buildStatItem(String icono, int valor) {
-  return Container(
-    width: 120, // ancho sugerido
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: Colors.black12),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.05),
-          blurRadius: 4,
-          offset: const Offset(0, 2),
+  Widget _mpChip(int value, String label) {
+    final esActivo = metodoPagoSeleccionado == value;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          metodoPagoSeleccionado = value;
+        });
+        _filterProducts(searchQuery);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: esActivo ? Colors.black : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.black54),
         ),
-      ],
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center, // 🔹 centra verticalmente
-      children: [
-        Text(icono, style: const TextStyle(fontSize: 26)),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Center(
-            child: Text(
-              valor.toString(),
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: esActivo ? Colors.white : Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String icono, int valor) {
+    return Container(
+      width: 120, // ancho sugerido
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.black12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment:
+            CrossAxisAlignment.center, // 🔹 centra verticalmente
+        children: [
+          Text(icono, style: const TextStyle(fontSize: 26)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Center(
+              child: Text(
+                valor.toString(),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,22 +324,6 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
                 ),
               ),
 
-              Text(
-                formatter.format(totalFiltrado),
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Constantes.colorSecundario,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                obtenerHorasPrimeraYUltimaOrden(),
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Constantes.colorSecundario,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               if (estadisticas != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -300,17 +336,21 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
                       const SizedBox(height: 8),
 
                       Wrap(
-  spacing: 12,
-  runSpacing: 12,
-  children: [
-    _buildStatItem("🍔", estadisticas!.hamburguesas),
-    _buildStatItem("🌭", estadisticas!.hotdogs),
-    _buildStatItem("🍟", estadisticas!.papasfritas),
-    _buildStatItem("3×50", estadisticas!.combos3x50),
-    _buildStatItem("3×80", estadisticas!.combos3x80),
-    _buildStatItem("🍔+🍟", estadisticas!.paquetehamburguesapapas),
-  ],
-),
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          _buildStatItem("🍔", estadisticas!.hamburguesas),
+                          _buildStatItem("🌭", estadisticas!.hotdogs),
+                          _buildStatItem("🍟", estadisticas!.papasfritas),
+                          _buildStatItem("3×50", estadisticas!.combos3x50),
+                          _buildStatItem("3×80", estadisticas!.combos3x80),
+                          _buildStatItem(
+                            "🍔+🍟",
+                            estadisticas!.paquetehamburguesapapas,
+                          ),
+                        ],
+                      ),
+
                       // Column(
                       //   children: [
                       //     _rowStat(
@@ -344,7 +384,37 @@ class _PantallaMostrarOrdenesState extends State<PantallaMostrarOrdenes> {
                     ],
                   ),
                 ),
+              const SizedBox(height: 10),
 
+              Text(
+                formatter.format(totalFiltrado),
+                style: TextStyle(
+                  fontSize: 22,
+                  color: Constantes.colorSecundario,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                obtenerHorasPrimeraYUltimaOrden(),
+                style: TextStyle(
+                  fontSize: 22,
+                  color: Constantes.colorSecundario,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Wrap(
+                spacing: 10,
+                children: [
+                  _mpChip(0, "Todos"),
+                  _mpChip(1, "Efectivo 💵"),
+                  _mpChip(2, "Tarjeta 💳"),
+                  _mpChip(3, "Transferencia 🏦"),
+                  // _mpChip(4, "Otro ⋯"),
+                ],
+              ),
               // 🔍 Buscador
               Padding(
                 padding: const EdgeInsets.symmetric(

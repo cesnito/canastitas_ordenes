@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ordenes/modelos/orden_tiempo_real.dart';
 
 class OrdenMuestra {
@@ -99,6 +101,42 @@ class OrdenMuestra {
         return 'Desconocido';
     }
   }
+  String get estatusMetodoPago {
+    switch (metodoPago) {
+      case 1:
+        return 'Efectivo';
+      case 2:
+        return 'Tarjeta';
+      case 3:
+        return 'Transferencia';
+      case 4:
+        return 'Otro';
+      default:
+        return 'Desconocido';
+    }
+  }
+
+  IconData getIconoMetodoPago() {
+  switch (metodoPago) {
+    case 1: return Icons.payments;        // efectivo
+    case 2: return Icons.credit_card;     // tarjeta
+    case 3: return Icons.account_balance; // transferencia
+    case 4: return Icons.more_horiz;      // otro
+    default: return Icons.help_outline;
+  }
+}
+
+  String tiempoQueTomo() {
+  try {
+    final inicio = DateFormat('yyyy-MM-dd HH:mm:ss').parse(creado);
+    final fin = DateFormat('yyyy-MM-dd HH:mm:ss').parse(actualizado);
+
+    final diff = fin.difference(inicio).inMinutes;
+    return "Tomó $diff mins";
+  } catch (e) {
+    return "";
+  }
+}
 
   OrdenTiempoReal toOrdenRT() {
   return OrdenTiempoReal(
