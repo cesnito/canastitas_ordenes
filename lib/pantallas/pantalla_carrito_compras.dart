@@ -11,6 +11,7 @@ import 'package:ordenes/utils/mensajes.dart';
 import 'package:ordenes/widgets/boton.dart';
 import 'package:ordenes/widgets/boton_retardo.dart';
 import 'package:ordenes/widgets/para_llevar.dart';
+import 'package:ordenes/widgets/ya_pagado.dart';
 import 'package:provider/provider.dart';
 
 class PantallaCarritoCompras extends StatefulWidget {
@@ -28,6 +29,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
   String cliente = "";
   String anotaciones = "";
   bool paraLlevar = false;
+  bool yaPagado = false;
 
   // Lista de mesas
   final List<Map<String, dynamic>> mesas = [
@@ -118,6 +120,7 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
         'notas': anotaciones,
         'idMesa': selectedMesa,
         'esParaLlevar': paraLlevar,
+        'yaPagado': yaPagado,
         'productos': cart.cartItems,
         'total': cart.totalPrice,
       };
@@ -400,7 +403,16 @@ class _PantallaCarritoComprasState extends State<PantallaCarritoCompras> {
 
             ParaLlevarSwitch(
               onChanged: (estado) {
-                paraLlevar = estado;
+                paraLlevar = estado;  
+              },
+            ),
+
+            const SizedBox(height: 20),
+
+            PagadoSwitch(
+              pagadoPorDefecto: false, 
+              onChanged: (estado) {
+                yaPagado = estado; 
               },
             ),
 

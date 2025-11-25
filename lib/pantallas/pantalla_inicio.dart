@@ -126,178 +126,260 @@ class _PantallaHomeState extends State<PantallaHome> {
                       OrdenTiempoReal orden = OrdenTiempoReal.fromJson(
                         _raworden,
                       );
-                      return Container(
-                        // padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: 90,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      width: 2,
-                                      color: Colors.black,
-                                    ),
+                      return Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  // padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
                                   ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 25,
-                                      child: Container(
+                                  child: Column(
+                                    children: [
+                                      Container(
                                         width: double.infinity,
-                                        margin: EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            // fit: BoxFit.cover,
-                                            // scale: 0.2,
-                                            image: AssetImage(
-                                              'assets/deliver/${orden.tipoOrden}.png',
+                                        height: 90,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                width: 2,
+                                                color: Colors.black,
+                                              ),
                                             ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 25,
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  margin: EdgeInsets.all(2),
+                                                  decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                      // fit: BoxFit.cover,
+                                                      // scale: 0.2,
+                                                      image: AssetImage(
+                                                        'assets/deliver/${orden.tipoOrden}.png',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 75,
+                                                child: Container(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  padding: EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                    color: orden
+                                                        .obtenerEstatusColor(),
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Orden #${orden.idOrden}",
+                                                        style: TextStyle(
+                                                          fontSize: 22,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Constantes
+                                                              .colorPrimario,
+                                                        ),
+                                                      ),
+                                                      // Text(
+                                                      //   "Cliente: ${orden.cliente}",
+                                                      //   style: TextStyle(
+                                                      //     fontSize: 15,
+                                                      //     fontWeight: FontWeight.bold,
+                                                      //     color: Colors.white,
+                                                      //   ),
+                                                      // ),
+                                                      // Text(
+                                                      //   "${orden.obtenerEstatusOrden()}",
+                                                      //   style: TextStyle(fontSize: 20, color: Constantes.colorPrimario),
+                                                      // ),
+                                                      Text(
+                                                        "Total: \$${orden.total.toStringAsFixed(2)}",
+                                                        style: TextStyle(
+                                                          fontSize: 22,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "${orden.obtenerHoraConHace()} - ${orden.obtenerMesa()}",
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      flex: 75,
-                                      child: Container(
-                                        alignment: Alignment.centerLeft,
-                                        padding: EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                          ),
-                                          color: orden.obtenerEstatusColor(),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                      Container(
+                                        width: double.infinity,
+                                        height: 45,
+                                        color: Colors.black,
+                                        margin: EdgeInsets.only(bottom: 5),
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              "Orden #${orden.idOrden}",
-                                              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Constantes.colorPrimario),
-                                            ),
-                                            // Text(
-                                            //   "Cliente: ${orden.cliente}",
-                                            //   style: TextStyle(
-                                            //     fontSize: 15,
-                                            //     fontWeight: FontWeight.bold,
-                                            //     color: Colors.white,
-                                            //   ),
-                                            // ),
-                                            // Text(
-                                            //   "${orden.obtenerEstatusOrden()}",
-                                            //   style: TextStyle(fontSize: 20, color: Constantes.colorPrimario),
-                                            // ),
-                                            Text(
-                                              "Total: \$${orden.total.toStringAsFixed(2)}",
-                                              style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                                            // Botón Detalles
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                width: double.infinity,
+                                                color:
+                                                    Constantes.colorSecundario,
+                                                alignment: Alignment.center,
+                                                child: TextButton.icon(
+                                                  onPressed: () {
+                                                    Haptic.sense();
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      '/detallesOrdenCreada',
+                                                      arguments: orden,
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.info_outline,
+                                                    color: Colors.white,
+                                                  ),
+                                                  label: Text(
+                                                    "Detalles",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                            Text(
-                                              "${orden.obtenerHoraConHace()} - ${orden.obtenerMesa()}",
-                                              style: TextStyle(fontSize: 15),
+
+                                            // Botón Cobrar
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                width: double.infinity,
+                                                color: Constantes.colorPrimario,
+                                                alignment: Alignment.center,
+                                                child: TextButton.icon(
+                                                  onPressed: () {
+                                                    Haptic.sense();
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      '/detallesOrdenCobrar',
+                                                      arguments: orden,
+                                                    );
+                                                  },
+                                                  icon: (orden.yaPagado == 1)
+                                                      ? Icon(
+                                                          Icons.info,
+                                                          color: Constantes
+                                                              .colorSecundario,
+                                                        )
+                                                      : Icon(
+                                                          Icons.attach_money,
+                                                          color: Constantes
+                                                              .colorSecundario,
+                                                        ),
+                                                  label: Text(
+                                                    (orden.yaPagado == 1)
+                                                        ? "Liberar"
+                                                        : "Cobrar",
+                                                    style: TextStyle(
+                                                      color: Constantes
+                                                          .colorSecundario,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            // Texto del cliente
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                margin: EdgeInsets.only(
+                                                  left: 10,
+                                                ),
+                                                child: Text(
+                                                  "${orden.cliente}",
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Constantes
+                                                        .colorPrimario,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // ⭐ Banner diagonal PAGADO
+                          if (orden.yaPagado == 1)
+                            Positioned(
+                              top: 5,
+                              right: 5,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Constantes.colorPrimario,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle,
+                                      color: Constantes.colorSecundario,
+                                      size: 18,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      "YA PAGADO",
+                                      style: TextStyle(
+                                        color: Constantes.colorSecundario,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            Container(
-                              width: double.infinity,
-                              height: 45,
-                              color: Colors.black,
-                              margin: EdgeInsets.only(bottom: 5),
-                              child: Row(
-                                children: [
-                                  // Botón Detalles
-                                  Expanded(
-                                    flex: 3,
-                                    child: Container(
-                                      width: double.infinity,
-                                      color: Constantes.colorSecundario,
-                                      alignment: Alignment.center,
-                                      child: TextButton.icon(
-                                        onPressed: () {
-                                          Haptic.sense();
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/detallesOrdenCreada',
-                                            arguments: orden,
-                                          );
-                                        },
-                                        icon: Icon(
-                                          Icons.info_outline,
-                                          color: Colors.white,
-                                        ),
-                                        label: Text(
-                                          "Detalles",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // Botón Cobrar
-                                  Expanded(
-                                    flex: 3,
-                                    child: Container(
-                                      width: double.infinity,
-                                      color: Constantes.colorPrimario,
-                                      alignment: Alignment.center,
-                                      child: TextButton.icon(
-                                        onPressed: () {
-                                          Haptic.sense();
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/detallesOrdenCobrar',
-                                            arguments: orden,
-                                          );
-                                        },
-                                        icon: Icon(
-                                          Icons.attach_money,
-                                          color: Constantes.colorSecundario,
-                                        ),
-                                        label: Text(
-                                          "Cobrar",
-                                          style: TextStyle(color: Constantes.colorSecundario),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // Texto del cliente
-                                  Expanded(
-                                    flex: 4,
-                                    child: Container(
-                                      margin: EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        "${orden.cliente}",
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Constantes.colorPrimario,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       );
                     },
                   ),
@@ -310,7 +392,7 @@ class _PantallaHomeState extends State<PantallaHome> {
       ],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Haptic.sense(); 
+          Haptic.sense();
           Navigator.pushNamed(context, '/ordenar');
           // Navigator.pushNamed(context, '/tipoconsumo');
         },

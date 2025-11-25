@@ -16,6 +16,7 @@ class OrdenTiempoReal {
   final int ordenModificada;
   final int productos;
   final int statusOrden;
+  final int yaPagado;
   final String tipoOrden;
   final double total;
 
@@ -27,6 +28,7 @@ class OrdenTiempoReal {
     required this.cliente,
     required this.statusOrden,
     required this.tipoOrden,
+    required this.yaPagado,
     required this.hora,
     required this.total,
   });
@@ -39,6 +41,7 @@ class OrdenTiempoReal {
       productos: json['productos'],
       cliente: json['cliente'],
       statusOrden: json['statusOrden'],
+      yaPagado: json['yaPagado'],
       tipoOrden: json['tipoOrden'],
       hora: json['hora'],
       total: (json['total'] as num).toDouble(),

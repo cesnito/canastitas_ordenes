@@ -15,6 +15,7 @@ class OrdenMuestra {
   final double totalEnApp;
   final String notas;
   final int esParaLlevar;
+  final int yaPagado;
   final String creado;
   final String actualizado;
 
@@ -31,6 +32,7 @@ class OrdenMuestra {
     required this.totalEnApp,
     required this.notas,
     required this.esParaLlevar,
+    required this.yaPagado,
     required this.creado,
     required this.actualizado,
   });
@@ -61,6 +63,7 @@ class OrdenMuestra {
       totalEnApp: parseDouble(json['totalEnApp']),
       notas: json['notas'] ?? '',
       esParaLlevar: parseInt(json['esParaLlevar']),
+      yaPagado: parseInt(json['yaPagado']),
       creado: json['creado'] ?? '',
       actualizado: json['actualizado'] ?? '',
     );
@@ -79,6 +82,7 @@ class OrdenMuestra {
     'totalEnApp': totalEnApp.toStringAsFixed(2),
     'notas': notas,
     'esParaLlevar': esParaLlevar,
+    'yaPagado': yaPagado,
     'creado': creado,
     'actualizado': actualizado,
   };
@@ -147,6 +151,7 @@ class OrdenMuestra {
     cliente: nombreCliente ?? "Sin nombre",
     statusOrden: statusOrden ?? 0,
     tipoOrden: "Desconocido",
+    yaPagado: yaPagado ?? 0,
     hora: "00:00",
     total: total ?? 0.0,
   );

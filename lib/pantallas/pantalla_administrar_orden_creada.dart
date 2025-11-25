@@ -14,6 +14,7 @@ import 'package:ordenes/widgets/boton.dart';
 import 'package:ordenes/widgets/boton_retardo.dart';
 import 'package:ordenes/widgets/metodo_pago.dart';
 import 'package:ordenes/widgets/para_llevar.dart';
+import 'package:ordenes/widgets/ya_pagado.dart';
 import 'package:provider/provider.dart';
 
 class PantallaDetallesOrdenCreada extends StatefulWidget {
@@ -35,6 +36,7 @@ class PantallaDetallesOrdenCreadaState
   String anotaciones = "";
 
   bool paraLlevar = false;
+  bool yaPagado = false;
   int metodoPago = 0;
 
   final List<Map<String, dynamic>> mesas = [
@@ -93,6 +95,9 @@ class PantallaDetallesOrdenCreadaState
               .map((item) => Product.fromJson(item))
               .toList();
 
+          print(ordendetalle['yaPagado']);
+
+
           // Ahora, con los detalles cargados, actualizas el carrito y otros datos
           final cart = Provider.of<CartProvider>(context, listen: false);
           cart.setEditingMode(true);
@@ -107,6 +112,7 @@ class PantallaDetallesOrdenCreadaState
             cliente = ordendetalle['cliente'];
             anotaciones = ordendetalle['notas'];
             paraLlevar = ordendetalle['paraLlevar'];
+            yaPagado = ordendetalle['yaPagado'];
             metodoPago = ordendetalle['metodoPago'] ?? 1; //Por defecto efectivo 
             _customerNameController.text = cliente;
             _orderNotesController.text = anotaciones;
@@ -183,6 +189,7 @@ class PantallaDetallesOrdenCreadaState
                   'cliente': cliente,
                   'notas': anotaciones,
                   'esParaLlevar': paraLlevar,
+                  'yaPagado': yaPagado,
                   'metodoPago': metodoPago,
                   'idMesa': selectedMesa,
                   'productos': cart.cartItems,
@@ -741,6 +748,13 @@ class PantallaDetallesOrdenCreadaState
                 isParaLlevarPorDefecto: paraLlevar,
                 onChanged: (estado) {
                   paraLlevar = estado;
+                },
+              ),
+              const SizedBox(height: 20),
+              PagadoSwitch( 
+                pagadoPorDefecto: yaPagado, 
+                onChanged: (estado) {
+                  yaPagado = estado; 
                 },
               ),
               const SizedBox(height: 20),
